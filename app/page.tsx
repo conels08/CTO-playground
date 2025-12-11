@@ -1,0 +1,92 @@
+import Card from "@/components/ui/Card";
+import Button from "@/components/ui/Button";
+import { getRandomHealthFact, getRandomQuote } from "@/lib/data";
+
+export default function Home() {
+  const healthFact = getRandomHealthFact();
+  const quote = getRandomQuote();
+
+  return (
+    <div className="bg-gray-50 py-12">
+      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        <div className="text-center">
+          <h1 className="text-4xl font-bold tracking-tight text-gray-900 sm:text-5xl md:text-6xl">
+            Welcome to CTO Playground
+          </h1>
+          <p className="mx-auto mt-3 max-w-md text-base text-gray-500 sm:text-lg md:mt-5 md:max-w-3xl md:text-xl">
+            A modern Next.js application with TypeScript, Tailwind CSS, and a
+            component library.
+          </p>
+        </div>
+
+        <div className="mt-12 grid gap-6 md:grid-cols-2">
+          <Card title="Health Fact of the Day">
+            <div className="space-y-2">
+              <h4 className="font-semibold text-gray-900">
+                {healthFact.title}
+              </h4>
+              <p className="text-gray-600">{healthFact.fact}</p>
+              <span className="inline-block rounded-full bg-blue-100 px-3 py-1 text-xs font-medium text-blue-800">
+                {healthFact.category}
+              </span>
+            </div>
+          </Card>
+
+          <Card title="Motivational Quote">
+            <div className="space-y-2">
+              <p className="text-gray-700 italic">&quot;{quote.text}&quot;</p>
+              <p className="text-sm text-gray-500">— {quote.author}</p>
+            </div>
+          </Card>
+        </div>
+
+        <div className="mt-12">
+          <Card title="Features">
+            <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+              <div>
+                <h5 className="font-semibold text-gray-900">⚡ Next.js 16</h5>
+                <p className="mt-1 text-sm text-gray-600">
+                  App Router with server components
+                </p>
+              </div>
+              <div>
+                <h5 className="font-semibold text-gray-900">🎨 Tailwind CSS</h5>
+                <p className="mt-1 text-sm text-gray-600">
+                  Utility-first styling framework
+                </p>
+              </div>
+              <div>
+                <h5 className="font-semibold text-gray-900">📦 TypeScript</h5>
+                <p className="mt-1 text-sm text-gray-600">
+                  Type-safe development
+                </p>
+              </div>
+              <div>
+                <h5 className="font-semibold text-gray-900">🧩 Components</h5>
+                <p className="mt-1 text-sm text-gray-600">
+                  Reusable UI component library
+                </p>
+              </div>
+              <div>
+                <h5 className="font-semibold text-gray-900">🛠️ Utilities</h5>
+                <p className="mt-1 text-sm text-gray-600">
+                  Date, math, and storage helpers
+                </p>
+              </div>
+              <div>
+                <h5 className="font-semibold text-gray-900">📊 Seed Data</h5>
+                <p className="mt-1 text-sm text-gray-600">
+                  Health facts and motivational content
+                </p>
+              </div>
+            </div>
+            <div className="mt-6 flex gap-4">
+              <Button>Get Started</Button>
+              <Button variant="outline">Learn More</Button>
+            </div>
+          </Card>
+        </div>
+      </div>
+    </div>
+  );
+}

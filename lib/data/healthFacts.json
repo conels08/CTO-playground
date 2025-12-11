@@ -1,0 +1,62 @@
+[
+  {
+    "id": 1,
+    "title": "Hydration Benefits",
+    "fact": "Drinking water can boost your metabolism by up to 30% for about an hour.",
+    "category": "nutrition"
+  },
+  {
+    "id": 2,
+    "title": "Exercise & Mental Health",
+    "fact": "Regular exercise can be as effective as antidepressants in treating mild to moderate depression.",
+    "category": "mental-health"
+  },
+  {
+    "id": 3,
+    "title": "Sleep Quality",
+    "fact": "Getting 7-9 hours of sleep per night can improve immune function and reduce inflammation.",
+    "category": "sleep"
+  },
+  {
+    "id": 4,
+    "title": "Walking Benefits",
+    "fact": "Just 30 minutes of walking a day can reduce your risk of heart disease by 35%.",
+    "category": "exercise"
+  },
+  {
+    "id": 5,
+    "title": "Stress Management",
+    "fact": "Deep breathing exercises can lower cortisol levels and reduce stress in just 5 minutes.",
+    "category": "mental-health"
+  },
+  {
+    "id": 6,
+    "title": "Nutrition Timing",
+    "fact": "Eating protein within 30 minutes after exercise helps maximize muscle recovery and growth.",
+    "category": "nutrition"
+  },
+  {
+    "id": 7,
+    "title": "Cardiovascular Health",
+    "fact": "Laughing for 15 minutes a day can improve your blood vessel function and increase blood flow.",
+    "category": "heart-health"
+  },
+  {
+    "id": 8,
+    "title": "Brain Health",
+    "fact": "Regular meditation can increase gray matter density in areas of the brain associated with learning and memory.",
+    "category": "mental-health"
+  },
+  {
+    "id": 9,
+    "title": "Bone Strength",
+    "fact": "Weight-bearing exercises like walking, running, or dancing can help prevent osteoporosis.",
+    "category": "exercise"
+  },
+  {
+    "id": 10,
+    "title": "Healthy Eating",
+    "fact": "Eating a diet rich in fruits and vegetables can reduce your risk of chronic diseases by up to 20%.",
+    "category": "nutrition"
+  }
+]
