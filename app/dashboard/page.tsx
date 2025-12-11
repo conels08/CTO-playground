@@ -1,14 +1,22 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Card from "@/components/ui/Card";
 import Button from "@/components/ui/Button";
 import { dateUtils, mathUtils, storageUtils } from "@/lib/utils";
 import { milestones } from "@/lib/data";
 
 export default function DashboardPage() {
+  // counter state
   const [count, setCount] = useState(() => storageUtils.getItem("counter", 0));
-  const today = new Date();
+
+  // NEW: client-only date handling
+  const [today, setToday] = useState<Date | null>(null);
+
+  // On mount, set today's date (so server + client match)
+  useEffect(() => {
+    setToday(new Date());
+  }, []);
 
   const handleIncrement = () => {
     const newCount = count + 1;
@@ -20,6 +28,10 @@ export default function DashboardPage() {
     setCount(0);
     storageUtils.setItem("counter", 0);
   };
+
+  // If today isn't set yet, return nothing so the HTML matches server output
+  if (!today) return null;
+
 
   return (
     <div className="bg-gray-50 py-12">

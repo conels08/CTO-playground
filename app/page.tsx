@@ -1,6 +1,7 @@
 import Card from "@/components/ui/Card";
 import Button from "@/components/ui/Button";
 import { getRandomHealthFact, getRandomQuote } from "@/lib/data";
+import Link from "next/link";
 
 export default function Home() {
   const healthFact = getRandomHealthFact();
@@ -11,11 +12,11 @@ export default function Home() {
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="text-center">
           <h1 className="text-4xl font-bold tracking-tight text-gray-900 sm:text-5xl md:text-6xl">
-            Welcome to CTO Playground
+            Welcome to Your Smoke-Free Journey
           </h1>
           <p className="mx-auto mt-3 max-w-md text-base text-gray-500 sm:text-lg md:mt-5 md:max-w-3xl md:text-xl">
-            A modern Next.js application with TypeScript, Tailwind CSS, and a
-            component library.
+            Track your days without cigarettes, unlock health milestones, and stay
+            motivated with real health facts and inspirational quotes.
           </p>
         </div>
 
@@ -81,7 +82,9 @@ export default function Home() {
               </div>
             </div>
             <div className="mt-6 flex gap-4">
-              <Button>Get Started</Button>
+              <Link href="/dashboard">
+                <Button size="lg">Get Started</Button>
+              </Link>
               <Button variant="outline">Learn More</Button>
             </div>
           </Card>
