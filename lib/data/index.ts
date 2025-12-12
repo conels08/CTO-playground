@@ -19,6 +19,6 @@ export const getRandomQuote = (): MotivationalQuote => {
   ];
 };
 
-export const getMilestonesByType = (type: string): Milestone[] => {
-  return milestones.filter((milestone) => milestone.type === type);
+export const getMilestonesByDays = (days: number): Milestone | undefined => {
+  return milestones.find((milestone) => milestone.days === days);
 };
