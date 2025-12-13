@@ -7,11 +7,10 @@ export interface HealthFact {
 
 export interface Milestone {
   id: number;
+  days: number;
   title: string;
   description: string;
   icon: string;
-  threshold: number;
-  type: string;
 }
 
 export interface MotivationalQuote {
