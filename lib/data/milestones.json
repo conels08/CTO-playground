@@ -1,82 +1,51 @@
 [
   {
     "id": 1,
-    "title": "First Step",
-    "description": "Completed your first workout",
-    "icon": "🎯",
-    "threshold": 1,
-    "type": "workout"
+    "days": 1,
+    "title": "First Day",
+    "description": "Completed your first smoke-free day",
+    "icon": "🎉"
   },
   {
     "id": 2,
-    "title": "Week Warrior",
-    "description": "Completed 7 consecutive days of activity",
-    "icon": "🔥",
-    "threshold": 7,
-    "type": "streak"
+    "days": 3,
+    "title": "3-Day Milestone",
+    "description": "Nicotine starts leaving your body",
+    "icon": "💪"
   },
   {
     "id": 3,
-    "title": "10K Steps",
-    "description": "Reached 10,000 steps in a single day",
-    "icon": "👟",
-    "threshold": 10000,
-    "type": "steps"
+    "days": 7,
+    "title": "One Week",
+    "description": "Your sense of taste and smell improves",
+    "icon": "👃"
   },
   {
     "id": 4,
-    "title": "Early Bird",
-    "description": "Completed a morning workout before 8 AM",
-    "icon": "🌅",
-    "threshold": 1,
-    "type": "special"
+    "days": 14,
+    "title": "Two Weeks",
+    "description": "Your circulation improves",
+    "icon": "❤️"
   },
   {
     "id": 5,
-    "title": "Hydration Hero",
-    "description": "Logged 8 glasses of water in a day",
-    "icon": "💧",
-    "threshold": 8,
-    "type": "water"
+    "days": 30,
+    "title": "One Month",
+    "description": "Your lung function improves",
+    "icon": "🫁"
   },
   {
     "id": 6,
-    "title": "Marathon Month",
-    "description": "Completed 20 workouts in a month",
-    "icon": "🏃",
-    "threshold": 20,
-    "type": "workout"
+    "days": 90,
+    "title": "Three Months",
+    "description": "Your risk of heart attack drops significantly",
+    "icon": "🏥"
   },
   {
     "id": 7,
-    "title": "Consistency King",
-    "description": "Maintained a 30-day streak",
-    "icon": "👑",
-    "threshold": 30,
-    "type": "streak"
-  },
-  {
-    "id": 8,
-    "title": "Sleep Champion",
-    "description": "Logged 7+ hours of sleep for 7 consecutive nights",
-    "icon": "😴",
-    "threshold": 7,
-    "type": "sleep"
-  },
-  {
-    "id": 9,
-    "title": "Goal Crusher",
-    "description": "Achieved your first fitness goal",
-    "icon": "🎊",
-    "threshold": 1,
-    "type": "goal"
-  },
-  {
-    "id": 10,
-    "title": "Century Club",
-    "description": "Completed 100 total workouts",
-    "icon": "💯",
-    "threshold": 100,
-    "type": "workout"
+    "days": 365,
+    "title": "One Year",
+    "description": "You've reduced your risk of lung cancer by 50%",
+    "icon": "🏆"
   }
 ]

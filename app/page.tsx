@@ -3,9 +3,34 @@ import Button from "@/components/ui/Button";
 import { getRandomHealthFact, getRandomQuote } from "@/lib/data";
 import Link from "next/link";
 
-export default function Home() {
+// Check if user has a quit profile by attempting to fetch progress data
+async function getQuitProfileStatus(): Promise<boolean> {
+  try {
+    const response = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000'}/api/quit-profile`, {
+      cache: 'no-cache'
+    });
+    
+    if (response.ok) {
+      const result = await response.json();
+      return result.success && result.data !== null;
+    }
+  } catch (error) {
+    // If there's an error fetching, assume no profile exists
+    console.log('Could not fetch quit profile:', error);
+  }
+  
+  return false;
+}
+
+export default async function Home() {
   const healthFact = getRandomHealthFact();
   const quote = getRandomQuote();
+  
+  // Check if user has a quit profile
+  const hasProfile = await getQuitProfileStatus();
+  
+  // Determine the destination for the "Get Started" button
+  const getStartedHref = hasProfile ? "/dashboard" : "/onboarding";
 
   return (
     <div className="bg-gray-50 py-12">
@@ -82,7 +107,7 @@ export default function Home() {
               </div>
             </div>
             <div className="mt-6 flex gap-4">
-              <Link href="/dashboard">
+              <Link href={getStartedHref}>
                 <Button size="lg">Get Started</Button>
               </Link>
               <Button variant="outline">Learn More</Button>
