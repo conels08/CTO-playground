@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import Card from "@/components/ui/Card";
 import Button from "@/components/ui/Button";
 import { milestones } from "@/lib/data";
+import { useRouter } from "next/navigation";
 
 interface ProgressData {
   daysQuit: number;
@@ -48,6 +49,7 @@ interface NewCheckInFormState {
 }
 
 export default function DashboardPage() {
+  const router = useRouter();
   const [progressData, setProgressData] = useState<ProgressData | null>(null);
   const [quitProfile, setQuitProfile] = useState<QuitProfile | null>(null);
   const [recentCheckIns, setRecentCheckIns] = useState<CheckIn[]>([]);
@@ -367,7 +369,11 @@ export default function DashboardPage() {
                     </div>
                   ))}
                   <div className="text-center pt-2">
-                    <Button size="sm" variant="outline">
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      onClick={() => router.push("/check-ins")}
+                    >
                       View All Check-ins
                     </Button>
                   </div>
