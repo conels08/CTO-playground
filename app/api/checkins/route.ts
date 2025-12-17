@@ -6,7 +6,7 @@ import { getCurrentUserId, formatDateForAPI } from '@/lib/api-utils';
 // Fetch daily check-ins for the current user
 export async function GET(request: NextRequest) {
   try {
-    const userId = getCurrentUserId();
+    const userId = await getCurrentUserId();
     const { searchParams } = new URL(request.url);
     
     // Parse date range parameters
@@ -56,7 +56,7 @@ export async function GET(request: NextRequest) {
 // Create a new daily check-in for the current user
 export async function POST(request: NextRequest) {
   try {
-    const userId = getCurrentUserId();
+    const userId = await getCurrentUserId();
     const body = await request.json();
     
     const { date, cravingIntensity, mood, notes } = body;

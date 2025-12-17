@@ -1,8 +1,36 @@
 // Utility functions for the quit smoking tracker
 
-// Get the current demo user ID (in production, this would be from authentication)
-export function getCurrentUserId(): string {
-  return "demo-user";
+// Utility functions for the quit smoking tracker
+
+import { cookies } from "next/headers";
+import { randomUUID } from "crypto";
+
+// Generate a simple random string for anonymous device IDs.
+function generateDeviceId() {
+  return `device_${Math.random().toString(36).slice(2)}_${Date.now()}`;
+}
+
+// Get or create a per-device user id stored in a cookie
+export async function getCurrentUserId(): Promise<string> {
+  // In Next 16, cookies() is async
+  const cookieStore = await cookies();
+
+  let deviceId = cookieStore.get("qs_device_id")?.value;
+
+  // If no cookie yet, create one and set it
+  if (!deviceId) {
+    deviceId = randomUUID();
+
+    cookieStore.set("qs_device_id", deviceId, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "lax",
+      path: "/",
+      maxAge: 60 * 60 * 24 * 365, // 1 year
+    });
+  }
+
+  return deviceId;
 }
 
 // Calculate days since quit date

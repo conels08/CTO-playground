@@ -6,7 +6,7 @@ import { getCurrentUserId, calculateDaysSinceQuit, calculateCigarettesAvoided, c
 // Fetch the current user's quit profile
 export async function GET(request: NextRequest) {
   try {
-    const userId = getCurrentUserId();
+    const userId = await getCurrentUserId();
     
     // Find or create user
     let user = await prisma.user.findUnique({
@@ -60,7 +60,7 @@ export async function GET(request: NextRequest) {
 // Create or update the user's quit profile
 export async function POST(request: NextRequest) {
   try {
-    const userId = getCurrentUserId();
+    const userId = await getCurrentUserId();
     const body = await request.json();
     
     // Validate required fields

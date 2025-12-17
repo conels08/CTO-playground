@@ -105,7 +105,7 @@ export default function OnboardingPage() {
                 value={formData.quitDate}
                 onChange={(e) => handleInputChange('quitDate', e.target.value)}
                 max={new Date().toISOString().split('T')[0]} // Can't choose future date
-                className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm bg-white text-gray-900 placeholder:text-gray-500 focus:outline-none focus:ring-blue-500 focus:border-blue-500"
                 required
               />
               <p className="mt-1 text-sm text-gray-500">
@@ -124,7 +124,7 @@ export default function OnboardingPage() {
                 onChange={(e) => handleInputChange('cigarettesPerDay', e.target.value)}
                 min="1"
                 max="100"
-                className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm bg-white text-gray-900 placeholder:text-gray-500 focus:outline-none focus:ring-blue-500 focus:border-blue-500"
                 placeholder="e.g., 20"
                 required
               />
@@ -147,7 +147,7 @@ export default function OnboardingPage() {
                   step="0.01"
                   min="0.01"
                   max="100"
-                  className="w-full pl-8 pr-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                  className="w-full pl-8 pr-3 py-2 border border-gray-300 rounded-md shadow-sm bg-white text-gray-900 placeholder:text-gray-500 focus:outline-none focus:ring-blue-500 focus:border-blue-500"
                   placeholder="e.g., 12.50"
                   required
                 />
@@ -165,7 +165,7 @@ export default function OnboardingPage() {
                 id="cigarettesPerPack"
                 value={formData.cigarettesPerPack}
                 onChange={(e) => handleInputChange('cigarettesPerPack', e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm bg-white text-gray-900 focus:outline-none focus:ring-blue-500 focus:border-blue-500"
               >
                 <option value="10">10 cigarettes</option>
                 <option value="20">20 cigarettes (standard)</option>
@@ -186,7 +186,7 @@ export default function OnboardingPage() {
                 value={formData.personalGoal}
                 onChange={(e) => handleInputChange('personalGoal', e.target.value)}
                 rows={3}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm bg-white text-gray-900 placeholder:text-gray-500 focus:outline-none focus:ring-blue-500 focus:border-blue-500"
                 placeholder="e.g., I want to save money for a vacation, improve my health for my family..."
               />
               <p className="mt-1 text-sm text-gray-500">

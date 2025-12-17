@@ -12,7 +12,7 @@ import {
 // Fetch computed progress statistics for the current user
 export async function GET(request: NextRequest) {
   try {
-    const userId = getCurrentUserId();
+    const userId = await getCurrentUserId();
     
     // Find user with quit profile
     const user = await prisma.user.findUnique({

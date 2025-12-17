@@ -110,7 +110,9 @@ export default async function Home() {
               <Link href={getStartedHref}>
                 <Button size="lg">Get Started</Button>
               </Link>
-              <Button variant="outline">Learn More</Button>
+              <Link href="/about">
+                <Button variant="outline">Learn More</Button>
+              </Link>
             </div>
           </Card>
         </div>
