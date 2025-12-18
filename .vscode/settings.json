@@ -2,5 +2,6 @@
   "css.lint.unknownAtRules": "ignore",
   "files.exclude": {
     "**/.next": true
-  }
+  },
+  "liveServer.settings.multiRootWorkspaceName": "CTO-playground"
 }
