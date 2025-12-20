@@ -8,20 +8,27 @@ const STORAGE_KEY = "theme";
 function applyTheme(theme: Theme) {
   const root = document.documentElement;
   root.classList.toggle("dark", theme === "dark");
+  root.setAttribute("data-theme", theme);
+}
+
+function getStoredTheme(): Theme {
+  try {
+    const saved = localStorage.getItem(STORAGE_KEY);
+    return saved === "dark" ? "dark" : "light";
+  } catch {
+    return "light";
+  }
 }
 
 export default function ThemeToggle() {
-  const [theme, setTheme] = React.useState<Theme>("light");
+  // Initialize from storage (so the button label matches immediately)
+  const [theme, setTheme] = React.useState<Theme>(() => "light");
 
+  // Apply on mount (and keep in sync with stored value)
   React.useEffect(() => {
-    try {
-      const saved = (localStorage.getItem(STORAGE_KEY) as Theme | null) ?? "light";
-      const initial: Theme = saved === "dark" ? "dark" : "light";
-      setTheme(initial);
-      applyTheme(initial);
-    } catch {
-      applyTheme("light");
-    }
+    const initial = getStoredTheme();
+    setTheme(initial);
+    applyTheme(initial);
   }, []);
 
   function toggle() {
