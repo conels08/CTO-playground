@@ -33,9 +33,7 @@ export default function CheckInsPage() {
         setCheckIns(result.data);
       } catch (err) {
         console.error("Error fetching check-ins:", err);
-        setError(
-          err instanceof Error ? err.message : "Failed to load check-ins"
-        );
+        setError(err instanceof Error ? err.message : "Failed to load check-ins");
       } finally {
         setIsLoading(false);
       }
@@ -49,10 +47,12 @@ export default function CheckInsPage() {
   };
 
   return (
-    <div className="bg-gray-50 min-h-screen py-12">
+    <div className="min-h-screen bg-gray-50 py-12 dark:bg-slate-950">
       <div className="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8">
         <div className="mb-6 flex items-center justify-between">
-          <h1 className="text-3xl font-bold text-gray-900">All Check-ins</h1>
+          <h1 className="text-3xl font-bold text-gray-900 dark:text-slate-100">
+            All Check-ins
+          </h1>
           <Button
             variant="outline"
             onClick={() => {
@@ -65,19 +65,19 @@ export default function CheckInsPage() {
 
         {isLoading && (
           <div className="flex justify-center py-12">
-            <p className="text-gray-600">Loading check-ins...</p>
+            <p className="text-gray-600 dark:text-slate-300">Loading check-ins...</p>
           </div>
         )}
 
         {error && !isLoading && (
-          <div className="mb-4 rounded-md border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-800">
+          <div className="mb-4 rounded-md border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-800 dark:border-red-500/30 dark:bg-red-500/10 dark:text-red-200">
             {error}
           </div>
         )}
 
         {!isLoading && !error && checkIns.length === 0 && (
           <Card>
-            <p className="text-center text-gray-600">
+            <p className="text-center text-gray-600 dark:text-slate-300">
               No check-ins yet. Start tracking from your dashboard!
             </p>
           </Card>
@@ -85,20 +85,19 @@ export default function CheckInsPage() {
 
         {!isLoading && !error && checkIns.length > 0 && (
           <Card>
-            <div className="divide-y divide-gray-200">
+            <div className="divide-y divide-gray-200 dark:divide-white/10">
               {checkIns.map((checkIn) => (
                 <div key={checkIn.id} className="py-4">
                   <div className="flex items-start justify-between">
                     <div>
-                      <p className="text-sm font-semibold text-gray-900">
+                      <p className="text-sm font-semibold text-gray-900 dark:text-slate-100">
                         {formatDate(checkIn.date)}
                       </p>
-                      <p className="mt-1 text-sm text-gray-700">
-                        Craving: {checkIn.cravingIntensity}/10 — Mood:{" "}
-                        {checkIn.mood}
+                      <p className="mt-1 text-sm text-gray-700 dark:text-slate-200">
+                        Craving: {checkIn.cravingIntensity}/10 — Mood: {checkIn.mood}
                       </p>
                       {checkIn.notes && (
-                        <p className="mt-1 text-sm text-gray-600">
+                        <p className="mt-1 text-sm text-gray-600 dark:text-slate-300">
                           {checkIn.notes}
                         </p>
                       )}

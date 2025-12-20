@@ -1,4 +1,4 @@
-'use client';
+"use client";
 
 import { useState, useEffect } from "react";
 import Card from "@/components/ui/Card";
@@ -56,9 +56,8 @@ export default function DashboardPage() {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState("");
 
-  // --- New check-in form state ---
   const [checkInForm, setCheckInForm] = useState<NewCheckInFormState>(() => ({
-    date: new Date().toISOString().split("T")[0], // today
+    date: new Date().toISOString().split("T")[0],
     cravingIntensity: "5",
     mood: "",
     notes: "",
@@ -76,7 +75,6 @@ export default function DashboardPage() {
     setError("");
 
     try {
-      // Fetch progress data
       const progressResponse = await fetch("/api/progress", { cache: "no-cache" });
       const progressResult = await progressResponse.json();
 
@@ -84,7 +82,6 @@ export default function DashboardPage() {
         setProgressData(progressResult.data);
       }
 
-      // Fetch quit profile
       const profileResponse = await fetch("/api/quit-profile", { cache: "no-cache" });
       const profileResult = await profileResponse.json();
 
@@ -92,12 +89,11 @@ export default function DashboardPage() {
         setQuitProfile(profileResult.data);
       }
 
-      // Fetch recent check-ins
       const checkInsResponse = await fetch("/api/checkins", { cache: "no-cache" });
       const checkInsResult = await checkInsResponse.json();
 
       if (checkInsResult.success) {
-        setRecentCheckIns(checkInsResult.data.slice(0, 5)); // Show only 5 most recent
+        setRecentCheckIns(checkInsResult.data.slice(0, 5));
       }
     } catch (err) {
       console.error("Error fetching dashboard data:", err);
@@ -148,8 +144,6 @@ export default function DashboardPage() {
         return;
       }
 
-
-      // Reset form (keep date as today)
       setCheckInForm({
         date: new Date().toISOString().split("T")[0],
         cravingIntensity: "5",
@@ -157,27 +151,25 @@ export default function DashboardPage() {
         notes: "",
       });
 
-      // Refresh dashboard data, so cards + list update
       await fetchDashboardData();
     } catch (err) {
       console.error("Error creating check-in:", err);
-      setCheckInError(
-        err instanceof Error ? err.message : "An unexpected error occurred"
-      );
+      setCheckInError(err instanceof Error ? err.message : "An unexpected error occurred");
     } finally {
       setIsSubmittingCheckIn(false);
     }
   };
 
-  // If data is still loading, show nothing
   if (isLoading) {
     return (
-      <div className="bg-gray-50 py-12">
+      <div className="bg-gray-50 py-12 dark:bg-slate-950">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-center py-12">
             <div className="text-center">
-              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto" />
-              <p className="mt-4 text-gray-600">Loading your progress...</p>
+              <div className="mx-auto h-12 w-12 animate-spin rounded-full border-b-2 border-blue-600 dark:border-blue-400" />
+              <p className="mt-4 text-gray-600 dark:text-slate-300">
+                Loading your progress...
+              </p>
             </div>
           </div>
         </div>
@@ -185,13 +177,12 @@ export default function DashboardPage() {
     );
   }
 
-  // If there's an error and no data, show message
   if (error && !progressData) {
     return (
-      <div className="bg-gray-50 py-12">
+      <div className="bg-gray-50 py-12 dark:bg-slate-950">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          <div className="text-center py-12">
-            <p className="text-red-600 mb-4">{error}</p>
+          <div className="py-12 text-center">
+            <p className="mb-4 text-red-600 dark:text-red-300">{error}</p>
             <Button onClick={fetchDashboardData}>Try Again</Button>
           </div>
         </div>
@@ -199,16 +190,15 @@ export default function DashboardPage() {
     );
   }
 
-  // If no quit profile exists, show onboarding prompt
   if (!quitProfile) {
     return (
-      <div className="bg-gray-50 py-12">
+      <div className="bg-gray-50 py-12 dark:bg-slate-950">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          <div className="text-center py-12">
-            <h1 className="text-4xl font-bold text-gray-900">
+          <div className="py-12 text-center">
+            <h1 className="text-4xl font-bold text-gray-900 dark:text-slate-100">
               Welcome to Your Dashboard
             </h1>
-            <p className="mt-4 text-lg text-gray-600">
+            <p className="mt-4 text-lg text-gray-600 dark:text-slate-300">
               Let&apos;s set up your quit profile to start tracking your progress.
             </p>
             <div className="mt-8">
@@ -223,68 +213,64 @@ export default function DashboardPage() {
   }
 
   return (
-    <div className="bg-gray-50 py-12">
+    <div className="bg-gray-50 py-12 dark:bg-slate-950">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="mb-8">
-          <h1 className="text-4xl font-bold text-gray-900">Dashboard</h1>
-          <p className="mt-4 text-lg text-gray-600">
+          <h1 className="text-4xl font-bold text-gray-900 dark:text-slate-100">
+            Dashboard
+          </h1>
+          <p className="mt-4 text-lg text-gray-600 dark:text-slate-300">
             {progressData?.motivationalMessage || "Track your smoke-free journey"}
           </p>
         </div>
 
-        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4 mb-8">
-          {/* Days Quit */}
+        <div className="mb-8 grid gap-6 md:grid-cols-2 lg:grid-cols-4">
           <Card title="Days Smoke-Free">
             <div className="text-center">
-              <div className="text-4xl font-bold text-green-600">
+              <div className="text-4xl font-bold text-green-600 dark:text-emerald-400">
                 {progressData?.daysQuit || quitProfile.daysSinceQuit || 0}
               </div>
-              <p className="text-sm text-gray-600 mt-2">days</p>
+              <p className="mt-2 text-sm text-gray-600 dark:text-slate-300">days</p>
             </div>
           </Card>
 
-          {/* Cigarettes Avoided */}
           <Card title="Cigarettes Avoided">
             <div className="text-center">
-              <div className="text-4xl font-bold text-blue-600">
-                {progressData?.cigarettesAvoided ||
-                  quitProfile.cigarettesAvoided ||
-                  0}
+              <div className="text-4xl font-bold text-blue-600 dark:text-sky-400">
+                {progressData?.cigarettesAvoided || quitProfile.cigarettesAvoided || 0}
               </div>
-              <p className="text-sm text-gray-600 mt-2">cigarettes</p>
+              <p className="mt-2 text-sm text-gray-600 dark:text-slate-300">cigarettes</p>
             </div>
           </Card>
 
-          {/* Money Saved */}
           <Card title="Money Saved">
             <div className="text-center">
-              <div className="text-4xl font-bold text-green-600">
-                {formatCurrency(
-                  progressData?.moneySaved || quitProfile.moneySaved || 0
-                )}
+              <div className="text-4xl font-bold text-green-600 dark:text-emerald-400">
+                {formatCurrency(progressData?.moneySaved || quitProfile.moneySaved || 0)}
               </div>
-              <p className="text-sm text-gray-600 mt-2">total savings</p>
+              <p className="mt-2 text-sm text-gray-600 dark:text-slate-300">
+                total savings
+              </p>
             </div>
           </Card>
 
-          {/* Health Snapshot */}
           <Card title="Health Snapshot">
             <div className="space-y-2 text-sm">
               <div className="flex justify-between">
-                <span className="text-gray-600">Avg. craving:</span>
-                <span className="font-medium text-gray-900">
+                <span className="text-gray-600 dark:text-slate-300">Avg. craving:</span>
+                <span className="font-medium text-gray-900 dark:text-slate-100">
                   {progressData?.healthSnapshot.averageCravingIntensity || 0}/10
                 </span>
               </div>
               <div className="flex justify-between">
-                <span className="text-gray-600">Check-ins:</span>
-                <span className="font-medium text-gray-900">
+                <span className="text-gray-600 dark:text-slate-300">Check-ins:</span>
+                <span className="font-medium text-gray-900 dark:text-slate-100">
                   {progressData?.healthSnapshot.recentCheckIns || 0}
                 </span>
               </div>
               <div className="flex justify-between">
-                <span className="text-gray-600">Mood:</span>
-                <span className="font-medium text-gray-900">
+                <span className="text-gray-600 dark:text-slate-300">Mood:</span>
+                <span className="font-medium text-gray-900 dark:text-slate-100">
                   {progressData?.healthSnapshot.mostCommonMood || "N/A"}
                 </span>
               </div>
@@ -293,44 +279,50 @@ export default function DashboardPage() {
         </div>
 
         <div className="grid gap-6 md:grid-cols-2">
-          {/* Milestones */}
           <Card title="Milestones">
             <div className="space-y-3">
               {progressData?.milestoneStatuses.map((milestone) => {
-                const milestoneData = milestones.find(
-                  (m) => m.days === milestone.days
-                );
+                const milestoneData = milestones.find((m) => m.days === milestone.days);
+
+                const achieved = milestone.achieved;
+
                 return (
                   <div
                     key={milestone.days}
-                    className={`flex items-start gap-3 rounded border p-3 ${
-                      milestone.achieved
-                        ? "border-green-200 bg-green-50"
-                        : "border-gray-200"
-                    }`}
+                    className={[
+                      "flex items-start gap-3 rounded border p-3",
+                      achieved
+                        ? "border-green-200 bg-green-50 dark:border-emerald-500/20 dark:bg-emerald-500/10"
+                        : "border-gray-200 bg-white dark:border-white/10 dark:bg-slate-900/40",
+                    ].join(" ")}
                   >
-                    <span className="text-2xl">
-                      {milestoneData?.icon || "🎯"}
-                    </span>
+                    <span className="text-2xl">{milestoneData?.icon || "🎯"}</span>
+
                     <div className="flex-1">
                       <h4
-                        className={`font-semibold ${
-                          milestone.achieved ? "text-green-900" : "text-gray-900"
-                        }`}
+                        className={[
+                          "font-semibold",
+                          achieved
+                            ? "text-green-900 dark:text-emerald-200"
+                            : "text-gray-900 dark:text-slate-100",
+                        ].join(" ")}
                       >
-                        {milestoneData?.title ||
-                          `${milestone.days} Days`}
+                        {milestoneData?.title || `${milestone.days} Days`}
                       </h4>
+
                       <p
-                        className={`text-sm ${
-                          milestone.achieved ? "text-green-700" : "text-gray-600"
-                        }`}
+                        className={[
+                          "text-sm",
+                          achieved
+                            ? "text-green-700 dark:text-emerald-200/80"
+                            : "text-gray-600 dark:text-slate-300",
+                        ].join(" ")}
                       >
-                        {milestoneData?.description ||
-                          `Smoke-free for ${milestone.days} days`}
+                        {milestoneData?.description || `Smoke-free for ${milestone.days} days`}
                       </p>
-                      {milestone.achieved && (
-                        <span className="inline-block mt-1 px-2 py-1 text-xs font-medium text-green-800 bg-green-100 rounded-full">
+
+                      {achieved && (
+                        <span className="mt-1 inline-block rounded-full bg-green-100 px-2 py-1 text-xs font-medium text-green-800 dark:bg-emerald-500/15 dark:text-emerald-200">
                           Achieved!
                         </span>
                       )}
@@ -341,83 +333,77 @@ export default function DashboardPage() {
             </div>
           </Card>
 
-          {/* Recent Check-ins + New Check-in form */}
           <Card title="Recent Check-ins">
             <div className="space-y-4">
               {recentCheckIns.length > 0 ? (
                 <div className="space-y-3">
                   {recentCheckIns.map((checkIn) => (
-                    <div key={checkIn.id} className="border rounded p-3">
-                      <div className="flex justify-between items-start mb-2">
-                        <span className="text-sm font-medium text-gray-900">
+                    <div
+                      key={checkIn.id}
+                      className="rounded border border-gray-200 bg-white p-3 dark:border-white/10 dark:bg-slate-900/40"
+                    >
+                      <div className="mb-2 flex items-start justify-between">
+                        <span className="text-sm font-medium text-gray-900 dark:text-slate-100">
                           {formatDate(checkIn.date)}
                         </span>
                         <div className="text-right">
-                          <div className="text-sm text-gray-600">
+                          <div className="text-sm text-gray-600 dark:text-slate-300">
                             Craving: {checkIn.cravingIntensity}/10
                           </div>
-                          <div className="text-sm text-gray-600">
+                          <div className="text-sm text-gray-600 dark:text-slate-300">
                             Mood: {checkIn.mood}
                           </div>
                         </div>
                       </div>
                       {checkIn.notes && (
-                        <p className="text-sm text-gray-700 mt-2">
+                        <p className="mt-2 text-sm text-gray-700 dark:text-slate-200">
                           {checkIn.notes}
                         </p>
                       )}
                     </div>
                   ))}
-                  <div className="text-center pt-2">
-                    <Button
-                      size="sm"
-                      variant="outline"
-                      onClick={() => router.push("/check-ins")}
-                    >
+
+                  <div className="pt-2 text-center">
+                    <Button size="sm" variant="outline" onClick={() => router.push("/check-ins")}>
                       View All Check-ins
                     </Button>
                   </div>
                 </div>
               ) : (
-                <div className="text-center py-4 text-gray-500">
+                <div className="py-4 text-center text-gray-500 dark:text-slate-300">
                   <p>No check-ins yet.</p>
-                  <p className="text-sm mt-1">
-                    Start tracking your daily progress!
-                  </p>
+                  <p className="mt-1 text-sm">Start tracking your daily progress!</p>
                 </div>
               )}
 
-              {/* New Check-in form */}
-              <div className="border-t pt-4 mt-2">
-                <h3 className="text-sm font-semibold text-gray-900 mb-2">
+              <div className="mt-2 border-t border-gray-200 pt-4 dark:border-white/10">
+                <h3 className="mb-2 text-sm font-semibold text-gray-900 dark:text-slate-100">
                   Add Today&apos;s Check-in
                 </h3>
 
                 {checkInError && (
-                  <div className="mb-3 rounded-md border border-red-200 bg-red-50 px-3 py-2 text-xs text-red-800">
+                  <div className="mb-3 rounded-md border border-red-200 bg-red-50 px-3 py-2 text-xs text-red-800 dark:border-red-500/30 dark:bg-red-500/10 dark:text-red-200">
                     {checkInError}
                   </div>
                 )}
 
                 <form onSubmit={handleCheckInSubmit} className="space-y-3">
                   <div>
-                    <label className="block text-xs font-medium text-gray-700 mb-1">
+                    <label className="mb-1 block text-xs font-medium text-gray-700 dark:text-slate-300">
                       Date
                     </label>
                     <input
                       type="date"
                       value={checkInForm.date}
                       max={new Date().toISOString().split("T")[0]}
-                      onChange={(e) =>
-                        handleCheckInChange("date", e.target.value)
-                      }
-                      className="w-full rounded-md border border-gray-300 px-2 py-1.5 text-sm text-gray-900 shadow-sm placeholder:text-gray-400 focus:border-blue-500 focus:outline-none focus:ring-blue-500"
+                      onChange={(e) => handleCheckInChange("date", e.target.value)}
+                      className="w-full rounded-md border border-gray-300 bg-white px-2 py-1.5 text-sm text-gray-900 shadow-sm placeholder:text-gray-400 focus:border-blue-500 focus:outline-none focus:ring-blue-500 dark:border-white/10 dark:bg-slate-900/40 dark:text-slate-100 dark:placeholder:text-slate-400"
                       required
                     />
                   </div>
 
                   <div>
-                    <label className="block text-xs font-medium text-gray-700 mb-1">
+                    <label className="mb-1 block text-xs font-medium text-gray-700 dark:text-slate-300">
                       Craving Intensity (1–10)
                     </label>
                     <input
@@ -425,24 +411,20 @@ export default function DashboardPage() {
                       min={1}
                       max={10}
                       value={checkInForm.cravingIntensity}
-                      onChange={(e) =>
-                        handleCheckInChange("cravingIntensity", e.target.value)
-                      }
-                      className="w-full rounded-md border border-gray-300 px-2 py-1.5 text-sm text-gray-900 shadow-sm placeholder:text-gray-400 focus:border-blue-500 focus:outline-none focus:ring-blue-500"
+                      onChange={(e) => handleCheckInChange("cravingIntensity", e.target.value)}
+                      className="w-full rounded-md border border-gray-300 bg-white px-2 py-1.5 text-sm text-gray-900 shadow-sm placeholder:text-gray-400 focus:border-blue-500 focus:outline-none focus:ring-blue-500 dark:border-white/10 dark:bg-slate-900/40 dark:text-slate-100 dark:placeholder:text-slate-400"
                       required
                     />
                   </div>
 
                   <div>
-                    <label className="block text-xs font-medium text-gray-700 mb-1">
+                    <label className="mb-1 block text-xs font-medium text-gray-700 dark:text-slate-300">
                       Mood
                     </label>
                     <select
                       value={checkInForm.mood}
-                      onChange={(e) =>
-                        handleCheckInChange("mood", e.target.value)
-                      }
-                      className="w-full rounded-md border border-gray-300 px-2 py-1.5 text-sm text-gray-900 shadow-sm focus:border-blue-500 focus:outline-none focus:ring-blue-500"
+                      onChange={(e) => handleCheckInChange("mood", e.target.value)}
+                      className="w-full rounded-md border border-gray-300 bg-white px-2 py-1.5 text-sm text-gray-900 shadow-sm focus:border-blue-500 focus:outline-none focus:ring-blue-500 dark:border-white/10 dark:bg-slate-900/40 dark:text-slate-100"
                       required
                     >
                       <option value="">Select mood</option>
@@ -456,26 +438,20 @@ export default function DashboardPage() {
                   </div>
 
                   <div>
-                    <label className="block text-xs font-medium text-gray-700 mb-1">
+                    <label className="mb-1 block text-xs font-medium text-gray-700 dark:text-slate-300">
                       Notes (optional)
                     </label>
                     <textarea
                       rows={2}
                       value={checkInForm.notes}
-                      onChange={(e) =>
-                        handleCheckInChange("notes", e.target.value)
-                      }
-                      className="w-full rounded-md border border-gray-300 px-2 py-1.5 text-sm text-gray-900 shadow-sm placeholder:text-gray-400 focus:border-blue-500 focus:outline-none focus:ring-blue-500"
+                      onChange={(e) => handleCheckInChange("notes", e.target.value)}
+                      className="w-full rounded-md border border-gray-300 bg-white px-2 py-1.5 text-sm text-gray-900 shadow-sm placeholder:text-gray-400 focus:border-blue-500 focus:outline-none focus:ring-blue-500 dark:border-white/10 dark:bg-slate-900/40 dark:text-slate-100 dark:placeholder:text-slate-400"
                       placeholder="How did today feel?"
                     />
                   </div>
 
                   <div className="flex justify-end">
-                    <Button
-                      type="submit"
-                      size="sm"
-                      disabled={isSubmittingCheckIn}
-                    >
+                    <Button type="submit" size="sm" disabled={isSubmittingCheckIn}>
                       {isSubmittingCheckIn ? "Saving..." : "Save Check-in"}
                     </Button>
                   </div>
@@ -485,17 +461,15 @@ export default function DashboardPage() {
           </Card>
         </div>
 
-        {/* Quit Profile Summary */}
         {quitProfile.personalGoal && (
           <div className="mt-6">
             <Card title="Your Goal">
-              <p className="text-gray-700">{quitProfile.personalGoal}</p>
+              <p className="text-gray-700 dark:text-slate-200">{quitProfile.personalGoal}</p>
             </Card>
           </div>
         )}
 
-        {/* Action Buttons */}
-        <div className="mt-8 flex gap-4 justify-center">
+        <div className="mt-8 flex justify-center gap-4">
           <Button onClick={fetchDashboardData} variant="outline">
             Refresh Data
           </Button>
