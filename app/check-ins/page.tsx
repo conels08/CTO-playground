@@ -47,7 +47,7 @@ export default function CheckInsPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 py-12 dark:bg-slate-950">
+    <div className="min-h-screen py-12 dark:bg-slate-950">
       <div className="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8">
         <div className="mb-6 flex items-center justify-between">
           <h1 className="text-3xl font-bold text-gray-900 dark:text-slate-100">

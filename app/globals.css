@@ -1,11 +1,83 @@
 @import "tailwindcss";
 
-/* Keep globals minimal so Tailwind classes control light/dark */
-html,
-body {
-  height: 100%;
+/* ---------
+   Theme tokens (semantic)
+   --------- */
+:root {
+  /* App surfaces */
+  --background: #f9fafb;
+  /* gray-50 */
+  --foreground: #111827;
+  /* gray-900 */
+
+  --surface: #ffffff;
+  /* cards/nav */
+  --surface-2: #f3f4f6;
+  /* subtle hover */
+  --border: rgba(17, 24, 39, 0.10);
+  /* soft border */
+
+  /* Text */
+  --muted: #6b7280;
+  /* gray-500 */
+  --muted-foreground: #4b5563;
+  /* gray-600 */
+
+  /* Brand / actions */
+  --primary: #2563eb;
+  /* blue-600 */
+  --primary-foreground: #ffffff;
+
+  /* Focus ring */
+  --ring: rgba(37, 99, 235, 0.45);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background: #0b1220;
+    /* deep slate */
+    --foreground: #e5e7eb;
+    /* slate-200/gray-200 */
+
+    --surface: #0f172a;
+    /* slate-900 */
+    --surface-2: rgba(255, 255, 255, 0.06);
+    --border: rgba(255, 255, 255, 0.10);
+
+    --muted: rgba(229, 231, 235, 0.72);
+    --muted-foreground: rgba(229, 231, 235, 0.82);
+
+    --primary: #60a5fa;
+    /* blue-400 */
+    --primary-foreground: #0b1220;
+
+    --ring: rgba(96, 165, 250, 0.50);
+  }
+}
+
+/* Tailwind v4 token bridge (so classes like bg-background work) */
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+
+  --color-surface: var(--surface);
+  --color-surface-2: var(--surface-2);
+  --color-border: var(--border);
+
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+
+  --color-ring: var(--ring);
+
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
 }
 
 body {
+  background: var(--background);
+  color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
 }

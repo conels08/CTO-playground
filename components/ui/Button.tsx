@@ -14,34 +14,21 @@ export default function Button({
   ...props
 }: ButtonProps) {
   const baseStyles =
-    "inline-flex items-center justify-center rounded-md font-medium " +
-    "transition-all duration-200 " +
-    "focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:ring-offset-transparent " +
-    "disabled:opacity-50 disabled:pointer-events-none " +
-    "active:translate-y-[0.5px]";
+    "inline-flex items-center justify-center rounded-md font-medium transition-colors " +
+    "focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:ring-offset-background " +
+    "disabled:opacity-50 disabled:pointer-events-none";
 
   const variantStyles = {
-    primary:
-      "bg-blue-600 text-white shadow-sm " +
-      "hover:bg-blue-500 hover:shadow-md " +
-      "active:bg-blue-600",
-
-    secondary:
-      "bg-gray-600 text-white shadow-sm " +
-      "hover:bg-gray-500 hover:shadow-md " +
-      "active:bg-gray-600",
-
+    primary: "bg-blue-600 text-white hover:bg-blue-700",
+    secondary: "bg-slate-700 text-white hover:bg-slate-800",
     outline:
-      // This is tuned for your current DARK UI
-      "border border-white/15 bg-white/5 text-white shadow-sm " +
-      "hover:bg-white/10 hover:border-white/25 hover:shadow-md " +
-      "active:bg-white/5",
+      "border border-border bg-surface text-foreground hover:bg-muted",
   };
 
   const sizeStyles = {
-    sm: "px-3 py-1.5 text-sm",
-    md: "px-4 py-2 text-base",
-    lg: "px-6 py-3 text-lg",
+    sm: "h-9 px-3 text-sm",
+    md: "h-10 px-4 text-base",
+    lg: "h-11 px-6 text-lg",
   };
 
   return (

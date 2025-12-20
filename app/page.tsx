@@ -32,7 +32,7 @@ export default async function Home() {
   const getStartedHref = hasProfile ? "/dashboard" : "/onboarding";
 
   return (
-    <div className="bg-gray-50 py-12 dark:bg-slate-950">
+    <div className="py-12 dark:bg-slate-950">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="text-center">
           <h1 className="text-4xl font-bold tracking-tight text-gray-900 dark:text-slate-100 sm:text-5xl md:text-6xl">
