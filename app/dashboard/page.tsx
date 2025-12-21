@@ -162,14 +162,12 @@ export default function DashboardPage() {
 
   if (isLoading) {
     return (
-      <div className="bg-gray-50 py-12 dark:bg-slate-950">
+      <div className="py-12">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-center py-12">
             <div className="text-center">
-              <div className="mx-auto h-12 w-12 animate-spin rounded-full border-b-2 border-blue-600 dark:border-blue-400" />
-              <p className="mt-4 text-gray-600 dark:text-slate-300">
-                Loading your progress...
-              </p>
+              <div className="mx-auto h-12 w-12 animate-spin rounded-full border-b-2 border-primary" />
+              <p className="mt-4 text-muted">Loading your progress...</p>
             </div>
           </div>
         </div>
@@ -179,10 +177,10 @@ export default function DashboardPage() {
 
   if (error && !progressData) {
     return (
-      <div className="bg-gray-50 py-12 dark:bg-slate-950">
+      <div className="py-12">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="py-12 text-center">
-            <p className="mb-4 text-red-600 dark:text-red-300">{error}</p>
+            <p className="mb-4 text-sm text-muted">{error}</p>
             <Button onClick={fetchDashboardData}>Try Again</Button>
           </div>
         </div>
@@ -192,13 +190,13 @@ export default function DashboardPage() {
 
   if (!quitProfile) {
     return (
-      <div className="bg-gray-50 py-12 dark:bg-slate-950">
+      <div className="py-12">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="py-12 text-center">
-            <h1 className="text-4xl font-bold text-gray-900 dark:text-slate-100">
+            <h1 className="text-4xl font-bold text-foreground">
               Welcome to Your Dashboard
             </h1>
-            <p className="mt-4 text-lg text-gray-600 dark:text-slate-300">
+            <p className="mt-4 text-lg text-muted">
               Let&apos;s set up your quit profile to start tracking your progress.
             </p>
             <div className="mt-8">
@@ -213,13 +211,11 @@ export default function DashboardPage() {
   }
 
   return (
-    <div className="py-12 dark:bg-slate-950">
+    <div className="py-12">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="mb-8">
-          <h1 className="text-4xl font-bold text-gray-900 dark:text-slate-100">
-            Dashboard
-          </h1>
-          <p className="mt-4 text-lg text-gray-600 dark:text-slate-300">
+          <h1 className="text-4xl font-bold text-foreground">Dashboard</h1>
+          <p className="mt-4 text-lg text-muted">
             {progressData?.motivationalMessage || "Track your smoke-free journey"}
           </p>
         </div>
@@ -227,50 +223,48 @@ export default function DashboardPage() {
         <div className="mb-8 grid gap-6 md:grid-cols-2 lg:grid-cols-4">
           <Card title="Days Smoke-Free">
             <div className="text-center">
-              <div className="text-4xl font-bold text-green-600 dark:text-emerald-400">
+              <div className="text-4xl font-bold text-success dark:text-foreground">
                 {progressData?.daysQuit || quitProfile.daysSinceQuit || 0}
               </div>
-              <p className="mt-2 text-sm text-gray-600 dark:text-slate-300">days</p>
+              <p className="mt-2 text-sm text-muted">days</p>
             </div>
           </Card>
 
           <Card title="Cigarettes Avoided">
             <div className="text-center">
-              <div className="text-4xl font-bold text-blue-600 dark:text-sky-400">
+              <div className="text-4xl font-bold text-info dark:text-foreground">
                 {progressData?.cigarettesAvoided || quitProfile.cigarettesAvoided || 0}
               </div>
-              <p className="mt-2 text-sm text-gray-600 dark:text-slate-300">cigarettes</p>
+              <p className="mt-2 text-sm text-muted">cigarettes</p>
             </div>
           </Card>
 
           <Card title="Money Saved">
             <div className="text-center">
-              <div className="text-4xl font-bold text-green-600 dark:text-emerald-400">
+              <div className="text-4xl font-bold text-success dark:text-foreground">
                 {formatCurrency(progressData?.moneySaved || quitProfile.moneySaved || 0)}
               </div>
-              <p className="mt-2 text-sm text-gray-600 dark:text-slate-300">
-                total savings
-              </p>
+              <p className="mt-2 text-sm text-muted">total savings</p>
             </div>
           </Card>
 
           <Card title="Health Snapshot">
             <div className="space-y-2 text-sm">
               <div className="flex justify-between">
-                <span className="text-gray-600 dark:text-slate-300">Avg. craving:</span>
-                <span className="font-medium text-gray-900 dark:text-slate-100">
+                <span className="text-muted">Avg. craving:</span>
+                <span className="font-medium text-foreground">
                   {progressData?.healthSnapshot.averageCravingIntensity || 0}/10
                 </span>
               </div>
               <div className="flex justify-between">
-                <span className="text-gray-600 dark:text-slate-300">Check-ins:</span>
-                <span className="font-medium text-gray-900 dark:text-slate-100">
+                <span className="text-muted">Check-ins:</span>
+                <span className="font-medium text-foreground">
                   {progressData?.healthSnapshot.recentCheckIns || 0}
                 </span>
               </div>
               <div className="flex justify-between">
-                <span className="text-gray-600 dark:text-slate-300">Mood:</span>
-                <span className="font-medium text-gray-900 dark:text-slate-100">
+                <span className="text-muted">Mood:</span>
+                <span className="font-medium text-foreground">
                   {progressData?.healthSnapshot.mostCommonMood || "N/A"}
                 </span>
               </div>
@@ -283,7 +277,6 @@ export default function DashboardPage() {
             <div className="space-y-3">
               {progressData?.milestoneStatuses.map((milestone) => {
                 const milestoneData = milestones.find((m) => m.days === milestone.days);
-
                 const achieved = milestone.achieved;
 
                 return (
@@ -291,38 +284,28 @@ export default function DashboardPage() {
                     key={milestone.days}
                     className={[
                       "flex items-start gap-3 rounded border p-3",
-                      achieved
-                        ? "border-green-200 bg-green-50 dark:border-emerald-500/20 dark:bg-emerald-500/10"
-                        : "border-gray-200 bg-white dark:border-white/10 dark:bg-slate-900/40",
+                      achieved ? "border-border bg-surface-2" : "border-border bg-surface",
                     ].join(" ")}
                   >
                     <span className="text-2xl">{milestoneData?.icon || "🎯"}</span>
 
                     <div className="flex-1">
-                      <h4
-                        className={[
-                          "font-semibold",
-                          achieved
-                            ? "text-green-900 dark:text-emerald-200"
-                            : "text-gray-900 dark:text-slate-100",
-                        ].join(" ")}
-                      >
+                      <h4 className="font-semibold text-foreground">
                         {milestoneData?.title || `${milestone.days} Days`}
                       </h4>
 
-                      <p
-                        className={[
-                          "text-sm",
-                          achieved
-                            ? "text-green-700 dark:text-emerald-200/80"
-                            : "text-gray-600 dark:text-slate-300",
-                        ].join(" ")}
-                      >
-                        {milestoneData?.description || `Smoke-free for ${milestone.days} days`}
+                      <p className="text-sm text-muted-foreground">
+                        {milestoneData?.description ||
+                          `Smoke-free for ${milestone.days} days`}
                       </p>
 
                       {achieved && (
-                        <span className="mt-1 inline-block rounded-full bg-green-100 px-2 py-1 text-xs font-medium text-green-800 dark:bg-emerald-500/15 dark:text-emerald-200">
+                        <span
+                          className={[
+                            "mt-1 inline-block rounded-full px-2 py-1 text-xs font-medium",
+                            "border border-success/25 bg-success/15 text-success",
+                          ].join(" ")}
+                        >
                           Achieved!
                         </span>
                       )}
@@ -340,23 +323,22 @@ export default function DashboardPage() {
                   {recentCheckIns.map((checkIn) => (
                     <div
                       key={checkIn.id}
-                      className="rounded border border-gray-200 bg-white p-3 dark:border-white/10 dark:bg-slate-900/40"
+                      className="rounded border border-border bg-surface p-3"
                     >
                       <div className="mb-2 flex items-start justify-between">
-                        <span className="text-sm font-medium text-gray-900 dark:text-slate-100">
+                        <span className="text-sm font-medium text-foreground">
                           {formatDate(checkIn.date)}
                         </span>
                         <div className="text-right">
-                          <div className="text-sm text-gray-600 dark:text-slate-300">
+                          <div className="text-sm text-muted">
                             Craving: {checkIn.cravingIntensity}/10
                           </div>
-                          <div className="text-sm text-gray-600 dark:text-slate-300">
-                            Mood: {checkIn.mood}
-                          </div>
+                          <div className="text-sm text-muted">Mood: {checkIn.mood}</div>
                         </div>
                       </div>
+
                       {checkIn.notes && (
-                        <p className="mt-2 text-sm text-gray-700 dark:text-slate-200">
+                        <p className="mt-2 text-sm text-muted-foreground">
                           {checkIn.notes}
                         </p>
                       )}
@@ -364,32 +346,36 @@ export default function DashboardPage() {
                   ))}
 
                   <div className="pt-2 text-center">
-                    <Button size="sm" variant="outline" onClick={() => router.push("/check-ins")}>
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      onClick={() => router.push("/check-ins")}
+                    >
                       View All Check-ins
                     </Button>
                   </div>
                 </div>
               ) : (
-                <div className="py-4 text-center text-gray-500 dark:text-slate-300">
+                <div className="py-4 text-center text-muted">
                   <p>No check-ins yet.</p>
                   <p className="mt-1 text-sm">Start tracking your daily progress!</p>
                 </div>
               )}
 
-              <div className="mt-2 border-t border-gray-200 pt-4 dark:border-white/10">
-                <h3 className="mb-2 text-sm font-semibold text-gray-900 dark:text-slate-100">
+              <div className="mt-2 border-t border-border pt-4">
+                <h3 className="mb-2 text-sm font-semibold text-foreground">
                   Add Today&apos;s Check-in
                 </h3>
 
                 {checkInError && (
-                  <div className="mb-3 rounded-md border border-red-200 bg-red-50 px-3 py-2 text-xs text-red-800 dark:border-red-500/30 dark:bg-red-500/10 dark:text-red-200">
+                  <div className="mb-3 rounded-md border border-border bg-surface-2 px-3 py-2 text-xs text-foreground">
                     {checkInError}
                   </div>
                 )}
 
                 <form onSubmit={handleCheckInSubmit} className="space-y-3">
                   <div>
-                    <label className="mb-1 block text-xs font-medium text-gray-700 dark:text-slate-300">
+                    <label className="mb-1 block text-xs font-medium text-muted-foreground">
                       Date
                     </label>
                     <input
@@ -397,13 +383,17 @@ export default function DashboardPage() {
                       value={checkInForm.date}
                       max={new Date().toISOString().split("T")[0]}
                       onChange={(e) => handleCheckInChange("date", e.target.value)}
-                      className="w-full rounded-md border border-gray-300 bg-white px-2 py-1.5 text-sm text-gray-900 shadow-sm placeholder:text-gray-400 focus:border-blue-500 focus:outline-none focus:ring-blue-500 dark:border-white/10 dark:bg-slate-900/40 dark:text-slate-100 dark:placeholder:text-slate-400"
+                      className={[
+                        "w-full rounded-md border px-2 py-1.5 text-sm shadow-sm",
+                        "border-border bg-surface text-foreground",
+                        "placeholder:text-muted focus:outline-none focus:ring-2 focus:ring-ring",
+                      ].join(" ")}
                       required
                     />
                   </div>
 
                   <div>
-                    <label className="mb-1 block text-xs font-medium text-gray-700 dark:text-slate-300">
+                    <label className="mb-1 block text-xs font-medium text-muted-foreground">
                       Craving Intensity (1–10)
                     </label>
                     <input
@@ -411,20 +401,30 @@ export default function DashboardPage() {
                       min={1}
                       max={10}
                       value={checkInForm.cravingIntensity}
-                      onChange={(e) => handleCheckInChange("cravingIntensity", e.target.value)}
-                      className="w-full rounded-md border border-gray-300 bg-white px-2 py-1.5 text-sm text-gray-900 shadow-sm placeholder:text-gray-400 focus:border-blue-500 focus:outline-none focus:ring-blue-500 dark:border-white/10 dark:bg-slate-900/40 dark:text-slate-100 dark:placeholder:text-slate-400"
+                      onChange={(e) =>
+                        handleCheckInChange("cravingIntensity", e.target.value)
+                      }
+                      className={[
+                        "w-full rounded-md border px-2 py-1.5 text-sm shadow-sm",
+                        "border-border bg-surface text-foreground",
+                        "placeholder:text-muted focus:outline-none focus:ring-2 focus:ring-ring",
+                      ].join(" ")}
                       required
                     />
                   </div>
 
                   <div>
-                    <label className="mb-1 block text-xs font-medium text-gray-700 dark:text-slate-300">
+                    <label className="mb-1 block text-xs font-medium text-muted-foreground">
                       Mood
                     </label>
                     <select
                       value={checkInForm.mood}
                       onChange={(e) => handleCheckInChange("mood", e.target.value)}
-                      className="w-full rounded-md border border-gray-300 bg-white px-2 py-1.5 text-sm text-gray-900 shadow-sm focus:border-blue-500 focus:outline-none focus:ring-blue-500 dark:border-white/10 dark:bg-slate-900/40 dark:text-slate-100"
+                      className={[
+                        "w-full rounded-md border px-2 py-1.5 text-sm shadow-sm",
+                        "border-border bg-surface text-foreground",
+                        "focus:outline-none focus:ring-2 focus:ring-ring",
+                      ].join(" ")}
                       required
                     >
                       <option value="">Select mood</option>
@@ -438,14 +438,18 @@ export default function DashboardPage() {
                   </div>
 
                   <div>
-                    <label className="mb-1 block text-xs font-medium text-gray-700 dark:text-slate-300">
+                    <label className="mb-1 block text-xs font-medium text-muted-foreground">
                       Notes (optional)
                     </label>
                     <textarea
                       rows={2}
                       value={checkInForm.notes}
                       onChange={(e) => handleCheckInChange("notes", e.target.value)}
-                      className="w-full rounded-md border border-gray-300 bg-white px-2 py-1.5 text-sm text-gray-900 shadow-sm placeholder:text-gray-400 focus:border-blue-500 focus:outline-none focus:ring-blue-500 dark:border-white/10 dark:bg-slate-900/40 dark:text-slate-100 dark:placeholder:text-slate-400"
+                      className={[
+                        "w-full rounded-md border px-2 py-1.5 text-sm shadow-sm",
+                        "border-border bg-surface text-foreground",
+                        "placeholder:text-muted focus:outline-none focus:ring-2 focus:ring-ring",
+                      ].join(" ")}
                       placeholder="How did today feel?"
                     />
                   </div>
@@ -464,7 +468,7 @@ export default function DashboardPage() {
         {quitProfile.personalGoal && (
           <div className="mt-6">
             <Card title="Your Goal">
-              <p className="text-gray-700 dark:text-slate-200">{quitProfile.personalGoal}</p>
+              <p className="text-muted-foreground">{quitProfile.personalGoal}</p>
             </Card>
           </div>
         )}
