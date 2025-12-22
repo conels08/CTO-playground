@@ -20,6 +20,29 @@ export default function CheckInsPage() {
   const { status } = useSession();
   const isDemo = status !== "authenticated";
 
+   const demoCheckIns: CheckIn[] = [
+    {
+      id: "demo-1",
+      date: "2025-12-20",
+      cravingIntensity: 4,
+      mood: "confident",
+      notes: "Cravings popped up after dinner. Took a walk and it passed.",
+    },
+    {
+      id: "demo-2",
+      date: "2025-12-19",
+      cravingIntensity: 6,
+      mood: "challenged",
+      notes: "Stress day. Kept it together. Big win.",
+    },
+    {
+      id: "demo-3",
+      date: "2025-12-18",
+      cravingIntensity: 3,
+      mood: "motivated",
+      notes: null,
+    },
+  ];
 
   useEffect(() => {
     // Demo mode: show sample data and skip API calls.
@@ -52,36 +75,12 @@ export default function CheckInsPage() {
     };
 
     fetchCheckIns();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    
   }, [isDemo]);
 
   const formatDate = (dateString: string) => {
     return new Date(dateString + "T00:00:00.000Z").toLocaleDateString();
   };
-
-  const demoCheckIns: CheckIn[] = [
-    {
-      id: "demo-1",
-      date: "2025-12-20",
-      cravingIntensity: 4,
-      mood: "confident",
-      notes: "Cravings popped up after dinner. Took a walk and it passed.",
-    },
-    {
-      id: "demo-2",
-      date: "2025-12-19",
-      cravingIntensity: 6,
-      mood: "challenged",
-      notes: "Stress day. Kept it together. Big win.",
-    },
-    {
-      id: "demo-3",
-      date: "2025-12-18",
-      cravingIntensity: 3,
-      mood: "motivated",
-      notes: null,
-    },
-  ];
 
   return (
     <div className="min-h-screen py-12 dark:bg-slate-950">
