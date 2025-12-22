@@ -3,6 +3,8 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import ThemeToggle from "@/components/ui/ThemeToggle";
+import { signIn, signOut, useSession } from "next-auth/react";
+import Button from "@/components/ui/Button";
 
 const navItems = [
   { name: "Home", path: "/" },
@@ -12,6 +14,7 @@ const navItems = [
 
 export default function Navigation() {
   const pathname = usePathname();
+  const { data: session } = useSession();
 
   return (
     <nav className="border-b border-border bg-surface">
@@ -45,7 +48,18 @@ export default function Navigation() {
               })}
             </div>
 
-            {/* Easy to find on mobile */}
+            {/* Auth button */}
+            {session ? (
+              <Button size="sm" variant="outline" onClick={() => signOut()}>
+                Sign out
+              </Button>
+            ) : (
+              <Button size="sm" variant="outline" onClick={() => signIn()}>
+                Sign in
+              </Button>
+            )}
+
+            {/* Theme toggle */}
             <ThemeToggle />
           </div>
         </div>

@@ -2,23 +2,22 @@ import type { Metadata } from "next";
 import "./globals.css";
 import Navigation from "@/components/layout/Navigation";
 import Footer from "@/components/layout/Footer";
+import AuthSessionProvider from "@/components/providers/SessionProvider";
 
 export const metadata: Metadata = {
   title: "Quit Smoking Tracker",
   description: "Track your progress and stay motivated to quit smoking.",
 };
 
-export default function RootLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
+export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en" suppressHydrationWarning>
       <body className="flex min-h-screen flex-col antialiased bg-background text-foreground">
-        <Navigation />
-        <main className="flex-1">{children}</main>
-        <Footer />
+        <AuthSessionProvider>
+          <Navigation />
+          <main className="flex-1">{children}</main>
+          <Footer />
+        </AuthSessionProvider>
       </body>
     </html>
   );
