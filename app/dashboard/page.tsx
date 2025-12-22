@@ -275,28 +275,52 @@ export default function DashboardPage() {
             <h1 className="text-4xl font-bold text-foreground">
               Welcome to Your Dashboard
             </h1>
-            <p className="mt-4 text-lg text-muted">
-              Let&apos;s set up your quit profile to start tracking your progress.
-            </p>
-            <div className="mt-8">
-              <Button onClick={() => (window.location.href = "/onboarding")}>
-                Set Up Quit Profile
-              </Button>
-            </div>
-            {isDemo && (
-              <div className="mb-6 rounded-lg border border-border bg-surface p-4">
-                <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-                  <div>
-                    <p className="font-semibold text-foreground">Demo Mode</p>
-                    <p className="text-sm text-muted-foreground">
-                      You’re viewing sample data. Sign in to save your real progress.
-                    </p>
+            {isDemo ? (
+              <>
+                <div className="mx-auto mt-6 max-w-3xl text-left">
+                  <div className="flex flex-col gap-3 rounded-2xl border border-orange-300/70 bg-orange-100/70 px-4 py-3 dark:border-orange-400/30 dark:bg-orange-500/10">
+                    <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+                      <div className="flex items-start gap-3">
+                        <span className="inline-flex h-6 items-center rounded-full bg-orange-500 px-2 text-xs font-semibold text-white dark:bg-orange-400 dark:text-slate-950">
+                          DEMO
+                        </span>
+
+                        <div>
+                          <p className="text-sm font-semibold text-emerald-900 dark:text-emerald-100">
+                            You’re viewing sample data
+                          </p>
+                          <p className="text-sm text-emerald-900/80 dark:text-emerald-100/80">
+                            Sign in to save your real progress and unlock personalized tracking.
+                          </p>
+                        </div>
+                      </div>
+
+                      <div className="sm:pl-4">
+                        <Button size="sm" variant="outline" onClick={() => signIn()}>
+                          Sign in to save
+                        </Button>
+                      </div>
+                    </div>
                   </div>
-                  <Button size="sm" variant="outline" onClick={() => signIn()}>
-                    Sign in to save
+                </div>
+
+                <p className="mt-6 text-lg text-muted">
+                  You can explore the dashboard with sample data, but signing in lets you save
+                  your real progress.
+                </p>
+              </>
+            ) : (
+              <>
+                <p className="mt-4 text-lg text-muted">
+                  Let&apos;s set up your quit profile to start tracking your progress.
+                </p>
+
+                <div className="mt-8">
+                  <Button onClick={() => (window.location.href = "/onboarding")}>
+                    Set Up Quit Profile
                   </Button>
                 </div>
-              </div>
+              </>
             )}
           </div>
         </div>
@@ -309,9 +333,36 @@ export default function DashboardPage() {
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="mb-8">
           <h1 className="text-4xl font-bold text-foreground">Dashboard</h1>
-          <p className="mt-4 text-lg text-muted">
-            {progressData?.motivationalMessage || "Track your smoke-free journey"}
-          </p>
+          {isDemo ? (
+            <div className="mt-4 flex flex-col gap-3 rounded-2xl border border-orange-300/70 bg-orange-100/70 px-4 py-3 dark:border-orange-400/30 dark:bg-orange-500/10">
+              <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+                <div className="flex items-start gap-3">
+                  <span className="inline-flex h-6 items-center rounded-full bg-orange-500 px-2 text-xs font-semibold text-white dark:bg-orange-400 dark:text-slate-950">
+                    DEMO
+                  </span>
+
+                  <div>
+                    <p className="text-sm font-semibold text-emerald-900 dark:text-emerald-100">
+                      You’re viewing sample data
+                    </p>
+                    <p className="text-sm text-emerald-900/80 dark:text-emerald-100/80">
+                      Sign in to save your real progress and unlock personalized tracking.
+                    </p>
+                  </div>
+                </div>
+
+                <div className="sm:pl-4">
+                  <Button size="sm" variant="outline" onClick={() => signIn()}>
+                    Sign in to save
+                  </Button>
+                </div>
+              </div>
+            </div>
+          ) : (
+            <p className="mt-4 text-lg text-muted">
+              {progressData?.motivationalMessage || "Track your smoke-free journey"}
+            </p>
+          )}
         </div>
 
         <div className="mb-8 grid gap-6 md:grid-cols-2 lg:grid-cols-4">
