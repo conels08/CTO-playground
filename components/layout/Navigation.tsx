@@ -50,7 +50,7 @@ export default function Navigation() {
 
             {/* Auth button */}
             {session ? (
-              <Button size="sm" variant="outline" onClick={() => signOut()}>
+              <Button size="sm" variant="outline" onClick={() => signOut({ callbackUrl: "/" })}>
                 Sign out
               </Button>
             ) : (
