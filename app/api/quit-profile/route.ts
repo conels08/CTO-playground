@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
+import { getServerSession } from "next-auth/next";
+import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 import {
   getCurrentUserId,
   calculateDaysSinceQuit,
@@ -10,6 +12,14 @@ import {
 // GET /api/quit-profile
 export async function GET(_request: NextRequest) {
   try {
+    const session = await getServerSession(authOptions);
+    if (!session) {
+      return NextResponse.json(
+        { success: false, message: "Unauthorized", data: null },
+        { status: 401 }
+      );
+    }
+
     const userId = await getCurrentUserId();
 
     const user = await prisma.user.findUnique({
@@ -61,6 +71,14 @@ export async function GET(_request: NextRequest) {
 // POST /api/quit-profile
 export async function POST(request: NextRequest) {
   try {
+    const session = await getServerSession(authOptions);
+    if (!session) {
+      return NextResponse.json(
+        { success: false, message: "Unauthorized" },
+        { status: 401 }
+      );
+    }
+
     const userId = await getCurrentUserId();
     const body = await request.json();
 

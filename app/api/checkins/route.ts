@@ -1,11 +1,21 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/db';
 import { getCurrentUserId, formatDateForAPI } from '@/lib/api-utils';
+import { getServerSession } from "next-auth/next";
+import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 
 // GET /api/checkins
 // Fetch daily check-ins for the current user
 export async function GET(request: NextRequest) {
   try {
+    const session = await getServerSession(authOptions);
+    if (!session) {
+      return NextResponse.json(
+        { success: false, message: "Unauthorized" },
+        { status: 401 }
+      );
+    }
+
     const userId = await getCurrentUserId();
     const { searchParams } = new URL(request.url);
     
@@ -56,6 +66,14 @@ export async function GET(request: NextRequest) {
 // Create a new daily check-in for the current user
 export async function POST(request: NextRequest) {
   try {
+    const session = await getServerSession(authOptions);
+    if (!session) {
+      return NextResponse.json(
+        { success: false, message: "Unauthorized" },
+        { status: 401 }
+      );
+    }
+
     const userId = await getCurrentUserId();
     const body = await request.json();
     

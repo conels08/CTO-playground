@@ -5,6 +5,54 @@ import Card from "@/components/ui/Card";
 import Button from "@/components/ui/Button";
 import { milestones } from "@/lib/data";
 import { useRouter } from "next/navigation";
+import { useSession, signIn } from "next-auth/react";
+
+function buildDemoData(): {
+  progress: ProgressData;
+  profile: QuitProfile;
+  checkIns: CheckIn[];
+} {
+  const demoProfile: QuitProfile = {
+    quitDate: new Date(Date.now() - 14 * 24 * 60 * 60 * 1000).toISOString(),
+    cigarettesPerDay: 10,
+    costPerPack: 10,
+    cigarettesPerPack: 20,
+    personalGoal: "I want my energy back and my mornings to feel clean.",
+    daysSinceQuit: 14,
+    cigarettesAvoided: 140,
+    moneySaved: 70,
+  };
+
+  const demoProgress: ProgressData = {
+    daysQuit: 14,
+    cigarettesAvoided: 140,
+    moneySaved: 70,
+    milestoneStatuses: milestones.map((m) => ({
+      days: m.days,
+      achieved: 14 >= m.days,
+    })),
+    healthSnapshot: {
+      averageCravingIntensity: 4.2,
+      recentCheckIns: 5,
+      mostCommonMood: "Proud",
+    },
+    motivationalMessage: "Demo Mode: You’re 14 days in — momentum is real.",
+  };
+
+  const today = new Date();
+  const mk = (d: number) => new Date(today.getTime() - d * 86400000).toISOString().slice(0, 10);
+
+  const demoCheckIns: CheckIn[] = [
+    { id: "demo-1", date: mk(0), cravingIntensity: 4, mood: "proud", notes: "Craving hit after lunch, breathed through it." },
+    { id: "demo-2", date: mk(1), cravingIntensity: 5, mood: "challenged", notes: "Stress spike, still didn’t cave." },
+    { id: "demo-3", date: mk(2), cravingIntensity: 3, mood: "confident", notes: null },
+    { id: "demo-4", date: mk(3), cravingIntensity: 6, mood: "stressed", notes: "Had a tough moment — walked it off." },
+    { id: "demo-5", date: mk(4), cravingIntensity: 3, mood: "motivated", notes: null },
+  ];
+
+  return { progress: demoProgress, profile: demoProfile, checkIns: demoCheckIns };
+}
+
 
 interface ProgressData {
   daysQuit: number;
@@ -50,6 +98,8 @@ interface NewCheckInFormState {
 
 export default function DashboardPage() {
   const router = useRouter();
+  const { status } = useSession();
+  const isDemo = status !== "authenticated";
   const [progressData, setProgressData] = useState<ProgressData | null>(null);
   const [quitProfile, setQuitProfile] = useState<QuitProfile | null>(null);
   const [recentCheckIns, setRecentCheckIns] = useState<CheckIn[]>([]);
@@ -66,9 +116,23 @@ export default function DashboardPage() {
   const [checkInError, setCheckInError] = useState("");
 
   useEffect(() => {
-    fetchDashboardData();
+    if (status === "loading") return;
+
+    if (status === "authenticated") {
+      fetchDashboardData();
+      return;
+    }
+
+    // Demo mode
+    const demo = buildDemoData();
+    setProgressData(demo.progress);
+    setQuitProfile(demo.profile);
+    setRecentCheckIns(demo.checkIns);
+    setError("");
+    setIsLoading(false);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [status]);
+
 
   const fetchDashboardData = async () => {
     setIsLoading(true);
@@ -76,6 +140,16 @@ export default function DashboardPage() {
 
     try {
       const progressResponse = await fetch("/api/progress", { cache: "no-cache" });
+
+      if (progressResponse.status === 401) {
+        const demo = buildDemoData();
+        setProgressData(demo.progress);
+        setQuitProfile(demo.profile);
+        setRecentCheckIns(demo.checkIns);
+        setError("");
+        return;
+      }
+
       const progressResult = await progressResponse.json();
 
       if (progressResult.success) {
@@ -122,6 +196,11 @@ export default function DashboardPage() {
 
   const handleCheckInSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (isDemo) {
+      setCheckInError("Demo Mode: sign in to save check-ins.");
+      return;
+    }
+
     setIsSubmittingCheckIn(true);
     setCheckInError("");
 
@@ -204,6 +283,21 @@ export default function DashboardPage() {
                 Set Up Quit Profile
               </Button>
             </div>
+            {isDemo && (
+              <div className="mb-6 rounded-lg border border-border bg-surface p-4">
+                <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                  <div>
+                    <p className="font-semibold text-foreground">Demo Mode</p>
+                    <p className="text-sm text-muted-foreground">
+                      You’re viewing sample data. Sign in to save your real progress.
+                    </p>
+                  </div>
+                  <Button size="sm" variant="outline" onClick={() => signIn()}>
+                    Sign in to save
+                  </Button>
+                </div>
+              </div>
+            )}
           </div>
         </div>
       </div>
