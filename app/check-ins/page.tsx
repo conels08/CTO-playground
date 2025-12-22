@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import Card from "@/components/ui/Card";
 import Button from "@/components/ui/Button";
+import { useSession, signIn } from "next-auth/react";
 
 interface CheckIn {
   id: string;
@@ -16,8 +17,19 @@ export default function CheckInsPage() {
   const [checkIns, setCheckIns] = useState<CheckIn[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState("");
+  const { status } = useSession();
+  const isDemo = status !== "authenticated";
+
 
   useEffect(() => {
+    // Demo mode: show sample data and skip API calls.
+    if (isDemo) {
+      setCheckIns(demoCheckIns);
+      setIsLoading(false);
+      setError("");
+      return;
+    }
+
     const fetchCheckIns = async () => {
       setIsLoading(true);
       setError("");
@@ -40,11 +52,36 @@ export default function CheckInsPage() {
     };
 
     fetchCheckIns();
-  }, []);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isDemo]);
 
   const formatDate = (dateString: string) => {
     return new Date(dateString + "T00:00:00.000Z").toLocaleDateString();
   };
+
+  const demoCheckIns: CheckIn[] = [
+    {
+      id: "demo-1",
+      date: "2025-12-20",
+      cravingIntensity: 4,
+      mood: "confident",
+      notes: "Cravings popped up after dinner. Took a walk and it passed.",
+    },
+    {
+      id: "demo-2",
+      date: "2025-12-19",
+      cravingIntensity: 6,
+      mood: "challenged",
+      notes: "Stress day. Kept it together. Big win.",
+    },
+    {
+      id: "demo-3",
+      date: "2025-12-18",
+      cravingIntensity: 3,
+      mood: "motivated",
+      notes: null,
+    },
+  ];
 
   return (
     <div className="min-h-screen py-12 dark:bg-slate-950">
@@ -62,6 +99,33 @@ export default function CheckInsPage() {
             Back to Dashboard
           </Button>
         </div>
+
+        {isDemo && (
+          <div className="mb-6 rounded-2xl border border-orange-200/80 bg-orange-50/70 px-4 py-3 dark:border-orange-400/25 dark:bg-orange-400/10">
+            <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+              <div className="flex items-start gap-3">
+                <span className="inline-flex h-6 items-center rounded-full bg-orange-600 px-2 text-xs font-semibold text-white dark:bg-orange-300 dark:text-slate-950">
+                  DEMO
+                </span>
+
+                <div>
+                  <p className="text-sm font-semibold text-orange-900 dark:text-orange-100">
+                    You’re viewing sample check-ins
+                  </p>
+                  <p className="text-sm text-orange-900/80 dark:text-orange-100/80">
+                    Sign in to save and view your real history.
+                  </p>
+                </div>
+              </div>
+
+              <div className="sm:pl-4">
+                <Button size="sm" variant="outline" onClick={() => signIn()}>
+                  Sign in to save
+                </Button>
+              </div>
+            </div>
+          </div>
+        )}
 
         {isLoading && (
           <div className="flex justify-center py-12">
