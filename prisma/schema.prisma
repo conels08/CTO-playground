@@ -7,20 +7,20 @@ generator client {
 
 datasource db {
   provider = "sqlite"
-  url      = "file:./dev.db"
 }
 
 // User model - stores basic user information
 model User {
-  id           String   @id @default(cuid())
-  email        String?  @unique
-  passwordHash String?
-  sessionToken String?  @unique
-  createdAt    DateTime @default(now())
+  id               String    @id @default(cuid())
+  email            String?   @unique
+  passwordHash     String?
+  sessionToken     String?   @unique
+  sessionExpiresAt DateTime?
+  createdAt        DateTime  @default(now())
 
   // Relations
-  quitProfile  QuitProfile?
-  checkIns     DailyCheckIn[]
+  quitProfile QuitProfile?
+  checkIns    DailyCheckIn[]
 }
 
 // QuitProfile model - stores smoking cessation data for each user
@@ -29,12 +29,12 @@ model QuitProfile {
   userId            String   @unique
   quitDate          DateTime
   cigarettesPerDay  Int
-  costPerPack       Float    // Cost per pack in user's currency
+  costPerPack       Float // Cost per pack in user's currency
   cigarettesPerPack Int      @default(20)
   personalGoal      String?
   createdAt         DateTime @default(now())
   updatedAt         DateTime @updatedAt
-  
+
   // Relations
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
@@ -44,14 +44,14 @@ model DailyCheckIn {
   id               String   @id @default(cuid())
   userId           String
   date             DateTime
-  cravingIntensity Int      // 1-10 scale
+  cravingIntensity Int // 1-10 scale
   mood             String
   notes            String?
   createdAt        DateTime @default(now())
-  
+
   // Relations
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
-  
+
   // Ensure one check-in per user per day
   @@unique([userId, date])
 }

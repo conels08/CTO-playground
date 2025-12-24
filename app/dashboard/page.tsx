@@ -130,7 +130,6 @@ export default function DashboardPage() {
     setRecentCheckIns(demo.checkIns);
     setError("");
     setIsLoading(false);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [status]);
 
 
