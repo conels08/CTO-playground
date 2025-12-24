@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/db';
+import { Prisma } from "@prisma/client";
 import { getCurrentUserId, formatDateForAPI } from '@/lib/api-utils';
 import { getServerSession } from "next-auth/next";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
@@ -24,16 +25,19 @@ export async function GET(request: NextRequest) {
     const toDate = searchParams.get('to');
     
     // Build where clause for date filtering
-    const where: any = { userId };
+    const where: Prisma.DailyCheckInWhereInput = { userId };
     
     if (fromDate || toDate) {
-      where.date = {};
+      const dateFilter: Prisma.DateTimeFilter = {};
+
       if (fromDate) {
-        where.date.gte = new Date(fromDate + 'T00:00:00.000Z');
+        dateFilter.gte = new Date(fromDate + "T00:00:00.000Z");
       }
       if (toDate) {
-        where.date.lte = new Date(toDate + 'T23:59:59.999Z');
+        dateFilter.lte = new Date(toDate + "T23:59:59.999Z");
       }
+
+      where.date = dateFilter;
     }
     
     // Fetch check-ins
@@ -126,7 +130,7 @@ export async function POST(request: NextRequest) {
         data: {
           userId,
           date: checkInDate,
-          cravingIntensity: parseInt(cravingIntensity),
+          cravingIntensity: Number(cravingIntensity),
           mood: mood.toString(),
           notes: notes || null
         }
@@ -144,9 +148,9 @@ export async function POST(request: NextRequest) {
         message: 'Check-in created successfully'
       }, { status: 201 });
       
-    } catch (error: any) {
+    } catch (error: unknown) {
       // Handle unique constraint violation (duplicate check-in for same date)
-      if (error.code === 'P2002') {
+      if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === "P2002") {
         return NextResponse.json({
           success: false,
           message: 'A check-in already exists for this date'

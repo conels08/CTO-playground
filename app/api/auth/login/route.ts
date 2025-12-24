@@ -19,16 +19,14 @@ export async function POST(request: NextRequest) {
       where: { email },
     });
 
-    const authUser = user as any;
-
-    if (!authUser || !authUser.passwordHash) {
+    if (!user || !user.passwordHash) {
       return NextResponse.json(
         { success: false, message: "Invalid email or password." },
         { status: 401 }
       );
     }
 
-    const isValid = await verifyPassword(password, authUser.passwordHash);
+    const isValid = await verifyPassword(password, user.passwordHash);
 
     if (!isValid) {
       return NextResponse.json(
@@ -42,11 +40,11 @@ export async function POST(request: NextRequest) {
     sessionExpiresAt.setDate(sessionExpiresAt.getDate() + 30); // 30 days
 
     await prisma.user.update({
-      where: { id: authUser.id },
+      where: { id: user.id },
       data: {
         sessionToken,
         sessionExpiresAt,
-      } as any,
+      },
     });
 
     const cookieStore = await cookies();

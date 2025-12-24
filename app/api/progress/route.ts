@@ -1,7 +1,8 @@
-import { NextRequest, NextResponse } from "next/server";
+import { NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 import { getServerSession } from "next-auth/next";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
+import type { DailyCheckIn } from "@prisma/client";
 
 import {
   getCurrentUserId,
@@ -12,7 +13,7 @@ import {
 } from "@/lib/api-utils";
 
 // GET /api/progress
-export async function GET(_request: NextRequest) {
+export async function GET() {
   try {
     const session = await getServerSession(authOptions);
     if (!session) {
@@ -143,7 +144,9 @@ function generateMotivationalMessage(
   )}.`;
 }
 
-function calculateHealthSnapshot(checkIns: any[]) {
+function calculateHealthSnapshot(
+  checkIns: Array<Pick<DailyCheckIn, "cravingIntensity" | "mood">>
+) {
   if (!checkIns || checkIns.length === 0) {
     return {
       averageCravingIntensity: 0,

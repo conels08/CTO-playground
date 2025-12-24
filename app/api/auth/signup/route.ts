@@ -20,17 +20,15 @@ export async function POST(request: NextRequest) {
     });
 
     if (existing) {
-      const authExisting = existing as any;
-
       // If user exists but has no password yet, allow setting it
-      if (!authExisting.passwordHash) {
+      if (!existing.passwordHash) {
         const newHash = await hashPassword(password);
 
         await prisma.user.update({
           where: { id: existing.id },
           data: {
             passwordHash: newHash,
-          } as any,
+          },
         });
 
         return NextResponse.json({
@@ -42,7 +40,7 @@ export async function POST(request: NextRequest) {
       // If user exists and has a password, block duplicate signups
       const passwordMatches = await verifyPassword(
         password,
-        authExisting.passwordHash
+        existing.passwordHash
       );
 
       if (passwordMatches) {
@@ -77,7 +75,7 @@ export async function POST(request: NextRequest) {
         passwordHash,
         sessionToken,
         sessionExpiresAt,
-      } as any,
+      },
     });
 
     const cookieStore = await cookies();

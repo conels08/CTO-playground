@@ -1,21 +1,19 @@
-import { NextRequest, NextResponse } from "next/server";
+import { NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 import { cookies } from "next/headers";
 
-export async function POST(request: NextRequest) {
+export async function POST() {
   try {
     const cookieStore = await cookies();
     const sessionToken = cookieStore.get("sessionToken")?.value;
 
     if (sessionToken) {
       await prisma.user.updateMany({
-        where: {
-          sessionToken,
-        } as any,
+        where: { sessionToken },
         data: {
           sessionToken: null,
           sessionExpiresAt: null,
-        } as any,
+        },
       });
 
       cookieStore.set("sessionToken", "", {
