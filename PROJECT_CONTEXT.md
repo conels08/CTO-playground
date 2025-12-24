@@ -200,3 +200,4 @@
 - (THE FOLLOWING CONTENT IS MEANT TO ACT AS A GENERAL RECORD KEEPER
   SOLELY FOR CHATGPT TO UNDERSTAND THE CHANGES THAT HAVE HAPPENED BECAUSE MEMORY MAY NOT PERSIST AFTER CLOSING AND RELOADING VS CODE. THESE NOTES ALLOW CHAT TO UNDERSTAND WHAT IT MAY HAVE DONE IN A PREVIOUS SESSION.)
 - Prisma schema squiggles were due to the VS Code Prisma extension using Prisma 7 rules; this project uses Prisma 5.15.1, where `datasource db { url = "file:./dev.db" }` is valid. Set `prisma.prismaPath` to `node_modules/.bin/prisma` so the extension uses the local CLI and stops flagging `url` as invalid.
+- Updated to Prisma 7 config flow: moved datasource URL to `prisma.config.ts`, removed `url` from `prisma/schema.prisma`, added SQLite adapter usage in `lib/db.ts` and `prisma/seed.ts`, and created migration `20251224132739_update_schema`. Also cleaned ESLint issues (unused param + eslint-disable) and removed `any` types in auth/checkins/progress routes; commits were pushed.
