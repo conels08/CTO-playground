@@ -1,38 +1,25 @@
-import { cookies } from "next/headers";
 import { prisma } from "@/lib/db";
+import type { Session } from "next-auth";
 
-export async function getCurrentUserId(): Promise<string> {
-  const cookieStore = await cookies();
-  const sessionToken = cookieStore.get("sessionToken")?.value;
+export async function getCurrentUserId(session: Session): Promise<string> {
+  const email = session.user?.email;
 
-  if (!sessionToken) {
-    // Fallback demo user so the app still works without real auth UI
+  if (!email) {
     const demoUser = await prisma.user.upsert({
       where: { email: "demo@example.com" },
       update: {},
       create: {
         email: "demo@example.com",
-      } as any,
+      },
     });
     return demoUser.id;
   }
 
-  const user = await prisma.user.findFirst({
-    where: {
-      sessionToken,
-    } as any,
+  const user = await prisma.user.upsert({
+    where: { email },
+    update: {},
+    create: { email },
   });
-
-  if (!user) {
-    const demoUser = await prisma.user.upsert({
-      where: { email: "demo@example.com" },
-      update: {},
-      create: {
-        email: "demo@example.com",
-      } as any,
-    });
-    return demoUser.id;
-  }
 
   return user.id;
 }

@@ -17,7 +17,7 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    const userId = await getCurrentUserId();
+    const userId = await getCurrentUserId(session);
     const { searchParams } = new URL(request.url);
     
     // Parse date range parameters
@@ -78,7 +78,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const userId = await getCurrentUserId();
+    const userId = await getCurrentUserId(session);
     const body = await request.json();
     
     const { date, cravingIntensity, mood, notes } = body;

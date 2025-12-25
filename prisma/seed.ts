@@ -1,10 +1,10 @@
 import { PrismaClient } from '@prisma/client';
-import { PrismaBetterSQLite3 } from '@prisma/adapter-better-sqlite3';
+import { PrismaBetterSqlite3 } from '@prisma/adapter-better-sqlite3';
 import Database from 'better-sqlite3';
 import path from 'node:path';
 
 const dbFile = path.join(process.cwd(), 'prisma', 'dev.db');
-const adapter = new PrismaBetterSQLite3(new Database(dbFile));
+const adapter = new PrismaBetterSqlite3(new Database(dbFile));
 const prisma = new PrismaClient({ adapter });
 
 async function main() {

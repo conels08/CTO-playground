@@ -53,6 +53,89 @@ function buildDemoData(): {
   return { progress: demoProgress, profile: demoProfile, checkIns: demoCheckIns };
 }
 
+type DemoProfileInput = {
+  quitDate: string;
+  cigarettesPerDay: number;
+  costPerPack: number;
+  cigarettesPerPack: number;
+  personalGoal: string | null;
+};
+
+const demoProfileStorageKey = "demo-quit-profile";
+
+function calculateDaysSinceQuitLocal(quitDate: string): number {
+  const start = new Date(quitDate);
+  const today = new Date();
+
+  start.setHours(0, 0, 0, 0);
+  today.setHours(0, 0, 0, 0);
+
+  const diffMs = today.getTime() - start.getTime();
+  return Math.max(0, Math.floor(diffMs / (1000 * 60 * 60 * 24)));
+}
+
+function buildDemoDataFromProfile(profile: DemoProfileInput): {
+  progress: ProgressData;
+  profile: QuitProfile;
+  checkIns: CheckIn[];
+} {
+  const daysSinceQuit = calculateDaysSinceQuitLocal(profile.quitDate);
+  const cigarettesAvoided = Math.max(0, profile.cigarettesPerDay * daysSinceQuit);
+  const packsPerDay = profile.cigarettesPerDay / profile.cigarettesPerPack;
+  const moneySaved = Number((packsPerDay * profile.costPerPack * daysSinceQuit).toFixed(2));
+
+  const demoProfile: QuitProfile = {
+    ...profile,
+    daysSinceQuit,
+    cigarettesAvoided,
+    moneySaved,
+  };
+
+  const demoProgress: ProgressData = {
+    daysQuit: daysSinceQuit,
+    cigarettesAvoided,
+    moneySaved,
+    milestoneStatuses: milestones.map((m) => ({
+      days: m.days,
+      achieved: daysSinceQuit >= m.days,
+    })),
+    healthSnapshot: {
+      averageCravingIntensity: 0,
+      recentCheckIns: 0,
+      mostCommonMood: "N/A",
+    },
+    motivationalMessage:
+      daysSinceQuit === 0
+        ? "Start your smoke-free journey today!"
+        : `You’re ${daysSinceQuit} day${daysSinceQuit === 1 ? "" : "s"} in — keep going.`,
+  };
+
+  return { progress: demoProgress, profile: demoProfile, checkIns: [] };
+}
+
+function readDemoProfileFromStorage(): DemoProfileInput | null {
+  try {
+    const raw = localStorage.getItem(demoProfileStorageKey);
+    if (!raw) return null;
+    const parsed = JSON.parse(raw) as DemoProfileInput;
+
+    if (!parsed?.quitDate) return null;
+    if (!Number.isFinite(parsed.cigarettesPerDay)) return null;
+    if (!Number.isFinite(parsed.costPerPack)) return null;
+    if (!Number.isFinite(parsed.cigarettesPerPack)) return null;
+
+    return {
+      quitDate: parsed.quitDate,
+      cigarettesPerDay: parsed.cigarettesPerDay,
+      costPerPack: parsed.costPerPack,
+      cigarettesPerPack: parsed.cigarettesPerPack,
+      personalGoal: parsed.personalGoal ?? null,
+    };
+  } catch (error) {
+    console.error("Failed to read demo profile:", error);
+    return null;
+  }
+}
 
 interface ProgressData {
   daysQuit: number;
@@ -105,6 +188,7 @@ export default function DashboardPage() {
   const [recentCheckIns, setRecentCheckIns] = useState<CheckIn[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState("");
+  const [demoSource, setDemoSource] = useState<"sample" | "local" | null>(null);
 
   const [checkInForm, setCheckInForm] = useState<NewCheckInFormState>(() => ({
     date: new Date().toISOString().split("T")[0],
@@ -119,15 +203,18 @@ export default function DashboardPage() {
     if (status === "loading") return;
 
     if (status === "authenticated") {
+      setDemoSource(null);
       fetchDashboardData();
       return;
     }
 
     // Demo mode
-    const demo = buildDemoData();
+    const storedProfile = readDemoProfileFromStorage();
+    const demo = storedProfile ? buildDemoDataFromProfile(storedProfile) : buildDemoData();
     setProgressData(demo.progress);
     setQuitProfile(demo.profile);
     setRecentCheckIns(demo.checkIns);
+    setDemoSource(storedProfile ? "local" : "sample");
     setError("");
     setIsLoading(false);
   }, [status]);
@@ -286,7 +373,7 @@ export default function DashboardPage() {
 
                         <div>
                           <p className="text-sm font-semibold text-emerald-900 dark:text-emerald-100">
-                            You’re viewing sample data
+                            You’re viewing demo data
                           </p>
                           <p className="text-sm text-emerald-900/80 dark:text-emerald-100/80">
                             Sign in to save your real progress and unlock personalized tracking.
@@ -304,9 +391,15 @@ export default function DashboardPage() {
                 </div>
 
                 <p className="mt-6 text-lg text-muted">
-                  You can explore the dashboard with sample data, but signing in lets you save
+                  You can explore the dashboard in demo mode, but signing in lets you save
                   your real progress.
                 </p>
+
+                <div className="mt-8">
+                  <Button onClick={() => (window.location.href = "/onboarding")}>
+                    Set Up Demo Profile
+                  </Button>
+                </div>
               </>
             ) : (
               <>
@@ -342,7 +435,9 @@ export default function DashboardPage() {
 
                   <div>
                     <p className="text-sm font-semibold text-emerald-900 dark:text-emerald-100">
-                      You’re viewing sample data
+                      {demoSource === "local"
+                        ? "You’re viewing your local demo profile"
+                        : "You’re viewing sample data"}
                     </p>
                     <p className="text-sm text-emerald-900/80 dark:text-emerald-100/80">
                       Sign in to save your real progress and unlock personalized tracking.

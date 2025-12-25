@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Card from "@/components/ui/Card";
 import Button from "@/components/ui/Button";
+import { useSession, signIn } from "next-auth/react";
 
 interface QuitProfileFormData {
   quitDate: string;
@@ -15,6 +16,8 @@ interface QuitProfileFormData {
 
 export default function OnboardingPage() {
   const router = useRouter();
+  const { status } = useSession();
+  const isDemo = status !== "authenticated";
   const [formData, setFormData] = useState<QuitProfileFormData>({
     quitDate: "",
     cigarettesPerDay: "",
@@ -36,16 +39,29 @@ export default function OnboardingPage() {
     setError("");
 
     try {
+      const payload = {
+        quitDate: formData.quitDate,
+        cigarettesPerDay: parseInt(formData.cigarettesPerDay),
+        costPerPack: parseFloat(formData.costPerPack),
+        cigarettesPerPack: parseInt(formData.cigarettesPerPack),
+        personalGoal: formData.personalGoal || null,
+      };
+
+      if (isDemo) {
+        try {
+          localStorage.setItem("demo-quit-profile", JSON.stringify(payload));
+        } catch (storageError) {
+          console.error("Unable to save demo profile locally:", storageError);
+        }
+
+        router.push("/dashboard");
+        return;
+      }
+
       const response = await fetch("/api/quit-profile", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          quitDate: formData.quitDate,
-          cigarettesPerDay: parseInt(formData.cigarettesPerDay),
-          costPerPack: parseFloat(formData.costPerPack),
-          cigarettesPerPack: parseInt(formData.cigarettesPerPack),
-          personalGoal: formData.personalGoal || null,
-        }),
+        body: JSON.stringify(payload),
       });
 
       const result = await response.json();
@@ -86,6 +102,18 @@ export default function OnboardingPage() {
         </div>
 
         <Card title="Quit Profile Setup">
+          {isDemo && (
+            <div className="mb-6 rounded-md border border-orange-300/70 bg-orange-100/70 p-4 text-sm text-emerald-900 dark:border-orange-400/30 dark:bg-orange-500/10 dark:text-emerald-100">
+              <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+                <span>
+                  Demo Mode: your data stays on this device unless you sign in.
+                </span>
+                <Button size="sm" variant="outline" onClick={() => signIn()}>
+                  Sign in to save
+                </Button>
+              </div>
+            </div>
+          )}
           <form onSubmit={handleSubmit} className="space-y-6">
             {error && (
               <div className="rounded-md border border-red-200 bg-red-50 p-4 dark:border-red-500/30 dark:bg-red-500/10">

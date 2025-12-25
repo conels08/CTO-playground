@@ -20,7 +20,7 @@ export async function GET() {
       );
     }
 
-    const userId = await getCurrentUserId();
+    const userId = await getCurrentUserId(session);
 
     const user = await prisma.user.findUnique({
       where: { id: userId },
@@ -79,7 +79,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const userId = await getCurrentUserId();
+    const userId = await getCurrentUserId(session);
     const body = await request.json();
 
     const {

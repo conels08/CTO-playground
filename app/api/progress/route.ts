@@ -23,7 +23,7 @@ export async function GET() {
       );
     }
 
-    const userId = await getCurrentUserId();
+    const userId = await getCurrentUserId(session);
 
     const user = await prisma.user.findUnique({
       where: { id: userId },
