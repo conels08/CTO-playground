@@ -11,7 +11,7 @@ A modern web application built with Next.js 16, TypeScript, and Tailwind CSS. Th
 - 🛠️ **Utility Functions** - Date, math, and localStorage helpers
 - 📊 **Seed Data** - Health facts, milestones, and motivational quotes
 - 🗄️ **Backend API** - Next.js Route Handlers with Prisma ORM
-- 🗃️ **Database** - SQLite with Prisma for local development
+- 🗃️ **Database** - SQLite with Prisma for local development (Supabase-ready later)
 - 📈 **Progress Tracking** - Days quit, cigarettes avoided, money saved
 - 🎯 **Milestones** - Achievement tracking with health benefits
 - 📝 **Daily Check-ins** - Track cravings, mood, and notes
@@ -22,7 +22,7 @@ A modern web application built with Next.js 16, TypeScript, and Tailwind CSS. Th
 - **Framework:** Next.js 16 (App Router)
 - **Language:** TypeScript 5
 - **Styling:** Tailwind CSS 4
-- **Database:** SQLite with Prisma ORM
+- **Database:** SQLite with Prisma ORM (swap to Postgres in production)
 - **API:** Next.js Route Handlers
 - **Authentication:** Simple demo user (easily extendable)
 - **Linting:** ESLint
@@ -33,44 +33,100 @@ A modern web application built with Next.js 16, TypeScript, and Tailwind CSS. Th
 
 ```
 .
-├── app/                      # Next.js app router
-│   ├── layout.tsx           # Root layout with navigation
-│   ├── page.tsx             # Home page
-│   ├── about/               # About page
-│   ├── dashboard/           # Dashboard page
-│   ├── onboarding/          # Onboarding flow
-│   └── api/                 # API Route Handlers
-│       ├── quit-profile/    # Quit profile endpoints
-│       ├── checkins/        # Daily check-in endpoints
-│       └── progress/        # Progress calculation endpoints
-├── components/              # React components
-│   ├── layout/              # Layout components
-│   │   ├── Navigation.tsx   # Navigation bar
-│   │   └── Footer.tsx       # Footer
-│   └── ui/                  # UI components
-│       ├── Button.tsx       # Button component
-│       └── Card.tsx         # Card component
-├── lib/                     # Shared libraries
-│   ├── data/                # Seed data
+├── .env.local
+├── .git/
+├── .gitignore
+├── .next/
+├── .prettierrc
+├── .vscode/
+│   └── settings.json
+├── PROJECT_CONTEXT.md
+├── README.md
+├── app/                           # Next.js app router
+│   ├── about/
+│   │   └── page.tsx
+│   ├── api/
+│   │   ├── auth/
+│   │   │   ├── [...nextauth]/
+│   │   │   │   └── route.ts
+│   │   │   ├── login/
+│   │   │   │   └── route.ts
+│   │   │   ├── logout/
+│   │   │   │   └── route.ts
+│   │   │   └── signup/
+│   │   │       └── route.ts
+│   │   ├── checkins/
+│   │   │   └── route.ts
+│   │   ├── progress/
+│   │   │   └── route.ts
+│   │   └── quit-profile/
+│   │       └── route.ts
+│   ├── auth/
+│   │   └── signin/
+│   │       └── page.tsx
+│   ├── check-ins/
+│   │   └── page.tsx
+│   ├── dashboard/
+│   │   └── page.tsx
+│   ├── onboarding/
+│   │   └── page.tsx
+│   ├── favicon.ico
+│   ├── globals.css
+│   ├── layout.tsx
+│   └── page.tsx
+├── better-sqlite3.d.ts
+├── components/
+│   ├── layout/
+│   │   ├── Footer.tsx
+│   │   └── Navigation.tsx
+│   ├── providers/
+│   │   └── SessionProvider.tsx
+│   └── ui/
+│       ├── Button.tsx
+│       ├── Card.tsx
+│       └── ThemeToggle.tsx
+├── eslint.config.mjs
+├── lib/
+│   ├── api-utils.ts
+│   ├── auth.ts
+│   ├── data/
 │   │   ├── healthFacts.json
+│   │   ├── index.ts
 │   │   ├── milestones.json
 │   │   ├── motivationalQuotes.json
-│   │   ├── types.ts
-│   │   └── index.ts
-│   ├── utils/               # Utility functions
-│   │   ├── date.ts          # Date utilities
-│   │   ├── math.ts          # Math utilities
-│   │   ├── localStorage.ts  # localStorage helpers
-│   │   └── index.ts
-│   ├── db.ts               # Prisma client setup
-│   └── api-utils.ts         # Backend utility functions
-├── prisma/                  # Database configuration
-│   ├── schema.prisma       # Database schema
-│   ├── .env                # Environment variables
-│   ├── seed.ts             # Database seeding script
-│   └── migrations/         # Database migrations
-└── public/                  # Static assets
+│   │   └── types.ts
+│   ├── db.ts
+│   └── utils/
+│       ├── date.ts
+│       ├── index.ts
+│       ├── localStorage.ts
+│       └── math.ts
+├── next.config.ts
+├── next-env.d.ts
+├── open
+├── node_modules/
+├── package-lock.json
+├── package.json
+├── postcss.config.mjs
+├── prisma.config.ts
+├── prisma/
+│   ├── .env
+│   ├── dev.db
+│   ├── migrations/
+│   │   └── migration_lock.toml
+│   ├── schema.prisma
+│   └── seed.ts
+├── public/
+│   ├── file.svg
+│   ├── globe.svg
+│   ├── next.svg
+│   ├── vercel.svg
+│   └── window.svg
+├── tsconfig.json
+└── tsconfig.tsbuildinfo
 ```
+
+Note: `.next/`, `node_modules/`, and `tsconfig.tsbuildinfo` are generated artifacts. `.env.local` and `prisma/.env` contain secrets and should not be committed.
 
 ## Getting Started
 
@@ -99,6 +155,9 @@ pnpm install
 3. Set up the database:
 
 ```bash
+# Ensure DATABASE_URL is set (no quotes) in .env.local, e.g.
+# DATABASE_URL=file:./prisma/dev.db
+
 # Generate Prisma client
 npm run db:generate
 
@@ -121,8 +180,8 @@ pnpm dev
 
 ### First Time Setup
 
-1. Navigate to `/onboarding` to set up your quit profile
-2. Fill in your quit date, smoking history, and goals
+1. Sign in at `/auth/signin` using the dev credentials in `.env.local`
+2. Navigate to `/onboarding` to set up your quit profile
 3. Start tracking your progress on the dashboard!
 4. Make daily check-ins to track your cravings and mood
 
@@ -332,6 +391,18 @@ Start the production server:
 ```bash
 npm run start
 ```
+
+## Local Demo vs Authenticated Mode
+
+- Demo mode: unauthenticated users see sample/local-only data.
+- Authenticated mode: signed-in users persist data via Prisma + SQLite locally.
+- Production: swap `DATABASE_URL` to your hosted Postgres and run migrations.
+- Browser devtools may show failed `utils.js`/`extensionState.js`/`heuristicsRedefinitions.js` network entries on the sign-in page; these are typically injected by browser extensions and are not app errors.
+
+## Troubleshooting
+
+- Prisma errors mentioning `replace` usually mean the SQLite adapter did not receive a `url` config; ensure `DATABASE_URL` is set and `lib/db.ts` uses `new PrismaBetterSqlite3({ url })`.
+- If the sign-in page shows failed script requests in DevTools Network, try a private window with extensions disabled; those requests are typically extension artifacts.
 
 ## Learn More
 

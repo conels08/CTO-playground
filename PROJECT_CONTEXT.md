@@ -139,7 +139,6 @@
   - POST creates check-in and handles duplicates
 - `lib/api-utils.ts`
   - Contains helper functions (`getCurrentUserId`, date formatting, calculations)
-  - Currently contains `any` types causing lint failure
 
 ## Environment Variables (Local vs Production)
 
@@ -149,20 +148,13 @@
   - Credentials for dev auth (if using credentials provider):
     - `AUTH_USER=...`
     - `AUTH_PASS=...`
+  - `DATABASE_URL=file:./prisma/dev.db` (no quotes)
 - Production will require setting env vars in Netlify (not in repo).
 - `.env.local` should not be committed.
 
 ## Lint/Tooling Notes
 
-- After enabling ESLint extension, errors surfaced that were already present.
-- Current `npm run lint` output (summary):
-  - Warnings:
-    - unused `_request` in quit-profile route
-    - missing hook dep in check-ins page
-    - unused eslint-disable in dashboard page
-  - Errors:
-    - `lib/api-utils.ts` uses explicit `any` three times
-- Fix errors first (lint must pass), then handle warnings.
+- Keep `npm run lint` passing; address new warnings as they appear.
 
 ## Deployment Notes / Expectations
 
@@ -199,9 +191,10 @@
 
 - (THE FOLLOWING CONTENT IS MEANT TO ACT AS A GENERAL RECORD KEEPER
   SOLELY FOR CHATGPT TO UNDERSTAND THE CHANGES THAT HAVE HAPPENED BECAUSE MEMORY MAY NOT PERSIST AFTER CLOSING AND RELOADING VS CODE. THESE NOTES ALLOW CHAT TO UNDERSTAND WHAT IT MAY HAVE DONE IN A PREVIOUS SESSION.)
-- Prisma schema squiggles were due to the VS Code Prisma extension using Prisma 7 rules; this project uses Prisma 5.15.1, where `datasource db { url = "file:./dev.db" }` is valid. Set `prisma.prismaPath` to `node_modules/.bin/prisma` so the extension uses the local CLI and stops flagging `url` as invalid.
-- Updated to Prisma 7 config flow: moved datasource URL to `prisma.config.ts`, removed `url` from `prisma/schema.prisma`, added SQLite adapter usage in `lib/db.ts` and `prisma/seed.ts`, and created migration `20251224132739_update_schema`. Also cleaned ESLint issues (unused param + eslint-disable) and removed `any` types in auth/checkins/progress routes; commits were pushed.
+- Prisma 7 uses `prisma.config.ts` for datasource URLs; `prisma/schema.prisma` should not define `url`. `lib/db.ts` uses a driver adapter for SQLite and relies on `.env.local` for production URLs. Keep `.env.local` unquoted.
+- Prisma SQLite adapter must be constructed with `{ url }` (not a pre-built `better-sqlite3` instance) to avoid `url.replace(...)` runtime crashes.
 - Added demo-mode onboarding flow: `/onboarding` now stores a local demo profile in `localStorage` when unauthenticated and routes to `/dashboard`, while authenticated users still save via `/api/quit-profile`. Dashboard now reads that local demo profile and renders computed stats instead of only sample data, and displays whether demo data is local or sample.
 - Switched `getCurrentUserId` to rely on NextAuth session (email) instead of cookie sessionToken; updated `/api/quit-profile`, `/api/progress`, and `/api/checkins` to pass the session for user scoping.
 - `lib/db.ts` now chooses the SQLite adapter only when `DATABASE_URL` is empty or file-based, otherwise uses standard PrismaClient for Postgres (Supabase-ready).
 - Enabled Prisma `driverAdapters` preview feature for Prisma 7 + SQLite adapter, and added a local `better-sqlite3.d.ts` to silence missing type errors in TS.
+- Sign-in page devtools may show failed requests for extension-injected scripts; these are browser extension artifacts, not app errors.
