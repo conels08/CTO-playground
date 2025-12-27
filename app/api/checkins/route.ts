@@ -79,9 +79,24 @@ export async function POST(request: NextRequest) {
     }
 
     const userId = await getCurrentUserId(session);
-    const body = await request.json();
+    let body: unknown;
+    try {
+      body = await request.json();
+    } catch {
+      return NextResponse.json(
+        { success: false, message: "Invalid JSON body" },
+        { status: 400 }
+      );
+    }
+
+    if (!body || typeof body !== "object") {
+      return NextResponse.json(
+        { success: false, message: "Invalid request body" },
+        { status: 400 }
+      );
+    }
     
-    const { date, cravingIntensity, mood, notes } = body;
+    const { date, cravingIntensity, mood, notes } = body as Record<string, unknown>;
     
     // Validate required fields
     if (!date || cravingIntensity === undefined || !mood) {
@@ -90,9 +105,31 @@ export async function POST(request: NextRequest) {
         message: 'Missing required fields: date, cravingIntensity, mood'
       }, { status: 400 });
     }
+
+    if (typeof date !== "string") {
+      return NextResponse.json({
+        success: false,
+        message: 'date must be a string'
+      }, { status: 400 });
+    }
+
+    if (typeof mood !== "string") {
+      return NextResponse.json({
+        success: false,
+        message: 'mood must be a string'
+      }, { status: 400 });
+    }
+
+    const parsedCraving = Number(cravingIntensity);
+    if (!Number.isFinite(parsedCraving)) {
+      return NextResponse.json({
+        success: false,
+        message: 'cravingIntensity must be a number'
+      }, { status: 400 });
+    }
     
     // Validate craving intensity (1-10 scale)
-    if (cravingIntensity < 1 || cravingIntensity > 10) {
+    if (parsedCraving < 1 || parsedCraving > 10) {
       return NextResponse.json({
         success: false,
         message: 'Craving intensity must be between 1 and 10'
@@ -101,6 +138,12 @@ export async function POST(request: NextRequest) {
     
     // Validate date is not in the future
     const checkInDate = new Date(date + 'T00:00:00.000Z');
+    if (Number.isNaN(checkInDate.getTime())) {
+      return NextResponse.json({
+        success: false,
+        message: 'Invalid date'
+      }, { status: 400 });
+    }
     const today = new Date();
     today.setHours(0, 0, 0, 0);
     
@@ -130,8 +173,8 @@ export async function POST(request: NextRequest) {
         data: {
           userId,
           date: checkInDate,
-          cravingIntensity: Number(cravingIntensity),
-          mood: mood.toString(),
+          cravingIntensity: parsedCraving,
+          mood: mood.trim(),
           notes: notes || null
         }
       });

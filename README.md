@@ -399,6 +399,14 @@ npm run start
 - Production: swap `DATABASE_URL` to your hosted Postgres and run migrations.
 - Browser devtools may show failed `utils.js`/`extensionState.js`/`heuristicsRedefinitions.js` network entries on the sign-in page; these are typically injected by browser extensions and are not app errors.
 
+## Production Readiness Checklist
+
+- Replace demo credentials with a real auth provider (email or OAuth) and a Prisma adapter.
+- Point `DATABASE_URL` at Supabase/Postgres and run `prisma migrate deploy`.
+- Add monitoring (Sentry) and basic analytics (Plausible/PostHog).
+- Add rate limiting for auth and write endpoints.
+- Add legal pages: Privacy Policy, Terms, and a medical disclaimer.
+
 ## Troubleshooting
 
 - Prisma errors mentioning `replace` usually mean the SQLite adapter did not receive a `url` config; ensure `DATABASE_URL` is set and `lib/db.ts` uses `new PrismaBetterSqlite3({ url })`.

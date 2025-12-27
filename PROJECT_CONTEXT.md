@@ -198,3 +198,5 @@
 - `lib/db.ts` now chooses the SQLite adapter only when `DATABASE_URL` is empty or file-based, otherwise uses standard PrismaClient for Postgres (Supabase-ready).
 - Enabled Prisma `driverAdapters` preview feature for Prisma 7 + SQLite adapter, and added a local `better-sqlite3.d.ts` to silence missing type errors in TS.
 - Sign-in page devtools may show failed requests for extension-injected scripts; these are browser extension artifacts, not app errors.
+- Added explicit request-body validation for quit profile and check-ins to return clean 400s instead of 500s.
+- Added baseline security headers in `next.config.ts` (no CSP to avoid asset breakage in dev).

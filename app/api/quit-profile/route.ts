@@ -80,7 +80,22 @@ export async function POST(request: NextRequest) {
     }
 
     const userId = await getCurrentUserId(session);
-    const body = await request.json();
+    let body: unknown;
+    try {
+      body = await request.json();
+    } catch {
+      return NextResponse.json(
+        { success: false, message: "Invalid JSON body" },
+        { status: 400 }
+      );
+    }
+
+    if (!body || typeof body !== "object") {
+      return NextResponse.json(
+        { success: false, message: "Invalid request body" },
+        { status: 400 }
+      );
+    }
 
     const {
       quitDate,
@@ -88,7 +103,7 @@ export async function POST(request: NextRequest) {
       costPerPack,
       cigarettesPerPack = 20,
       personalGoal,
-    } = body;
+    } = body as Record<string, unknown>;
 
     if (!quitDate || cigarettesPerDay == null || costPerPack == null) {
       return NextResponse.json(
@@ -97,6 +112,38 @@ export async function POST(request: NextRequest) {
           message:
             "Missing required fields: quitDate, cigarettesPerDay, costPerPack",
         },
+        { status: 400 }
+      );
+    }
+
+    if (typeof quitDate !== "string") {
+      return NextResponse.json(
+        { success: false, message: "quitDate must be a string" },
+        { status: 400 }
+      );
+    }
+
+    const parsedCigarettesPerDay = Number(cigarettesPerDay);
+    const parsedCostPerPack = Number(costPerPack);
+    const parsedCigarettesPerPack = Number(cigarettesPerPack);
+
+    if (!Number.isFinite(parsedCigarettesPerDay) || parsedCigarettesPerDay <= 0) {
+      return NextResponse.json(
+        { success: false, message: "cigarettesPerDay must be a positive number" },
+        { status: 400 }
+      );
+    }
+
+    if (!Number.isFinite(parsedCostPerPack) || parsedCostPerPack <= 0) {
+      return NextResponse.json(
+        { success: false, message: "costPerPack must be a positive number" },
+        { status: 400 }
+      );
+    }
+
+    if (!Number.isFinite(parsedCigarettesPerPack) || parsedCigarettesPerPack <= 0) {
+      return NextResponse.json(
+        { success: false, message: "cigarettesPerPack must be a positive number" },
         { status: 400 }
       );
     }
@@ -126,17 +173,17 @@ export async function POST(request: NextRequest) {
       where: { userId },
       update: {
         quitDate: parsedQuitDate,
-        cigarettesPerDay: Number(cigarettesPerDay),
-        costPerPack: Number(costPerPack),
-        cigarettesPerPack: Number(cigarettesPerPack),
+        cigarettesPerDay: parsedCigarettesPerDay,
+        costPerPack: parsedCostPerPack,
+        cigarettesPerPack: parsedCigarettesPerPack,
         personalGoal: personalGoal || null,
       },
       create: {
         userId,
         quitDate: parsedQuitDate,
-        cigarettesPerDay: Number(cigarettesPerDay),
-        costPerPack: Number(costPerPack),
-        cigarettesPerPack: Number(cigarettesPerPack),
+        cigarettesPerDay: parsedCigarettesPerDay,
+        costPerPack: parsedCostPerPack,
+        cigarettesPerPack: parsedCigarettesPerPack,
         personalGoal: personalGoal || null,
       },
     });
