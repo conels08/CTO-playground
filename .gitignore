@@ -38,6 +38,7 @@ yarn-error.log*
 *.db-journal
 prisma/dev.db*
 prisma/migrations/*/migration.sql
+prisma/migrations_sqlite_backup/
 
 # vercel
 .vercel

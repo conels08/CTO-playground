@@ -11,7 +11,7 @@ A modern web application built with Next.js 16, TypeScript, and Tailwind CSS. Th
 - 🛠️ **Utility Functions** - Date, math, and localStorage helpers
 - 📊 **Seed Data** - Health facts, milestones, and motivational quotes
 - 🗄️ **Backend API** - Next.js Route Handlers with Prisma ORM
-- 🗃️ **Database** - SQLite with Prisma for local development (Supabase-ready later)
+- 🗃️ **Database** - Supabase Postgres (Prisma ORM)
 - 📈 **Progress Tracking** - Days quit, cigarettes avoided, money saved
 - 🎯 **Milestones** - Achievement tracking with health benefits
 - 📝 **Daily Check-ins** - Track cravings, mood, and notes
@@ -22,7 +22,7 @@ A modern web application built with Next.js 16, TypeScript, and Tailwind CSS. Th
 - **Framework:** Next.js 16 (App Router)
 - **Language:** TypeScript 5
 - **Styling:** Tailwind CSS 4
-- **Database:** SQLite with Prisma ORM (swap to Postgres in production)
+- **Database:** Supabase Postgres with Prisma ORM
 - **API:** Next.js Route Handlers
 - **Authentication:** Simple demo user (easily extendable)
 - **Linting:** ESLint
@@ -155,14 +155,14 @@ pnpm install
 3. Set up the database:
 
 ```bash
-# Ensure DATABASE_URL is set (no quotes) in .env.local, e.g.
-# DATABASE_URL=file:./prisma/dev.db
+# Ensure DATABASE_URL is set (no quotes) in .env.local/.env
+# DATABASE_URL=<your-supabase-direct-url>
 
 # Generate Prisma client
 npm run db:generate
 
 # Run database migrations
-npm run db:migrate
+npx prisma migrate deploy
 
 # (Optional) Seed the database with sample data
 npm run db:seed
@@ -395,8 +395,8 @@ npm run start
 ## Local Demo vs Authenticated Mode
 
 - Demo mode: unauthenticated users see sample/local-only data.
-- Authenticated mode: signed-in users persist data via Prisma + SQLite locally.
-- Production: swap `DATABASE_URL` to your hosted Postgres and run migrations.
+- Authenticated mode: signed-in users persist data via Prisma + Supabase Postgres.
+- Production: set `DATABASE_URL` in Netlify and run migrations.
 - Browser devtools may show failed `utils.js`/`extensionState.js`/`heuristicsRedefinitions.js` network entries on the sign-in page; these are typically injected by browser extensions and are not app errors.
 
 ## Production Readiness Checklist
@@ -417,7 +417,7 @@ npm run start
 
 1. Create a Supabase project and set a database password.
 2. Copy the **Direct connection** string from Supabase.
-3. Set `.env.local`:
+3. Set `.env` and `.env.local`:
    - `DATABASE_URL=<your-supabase-direct-url>`
    - Optional for migrations: `SHADOW_DATABASE_URL=<shadow-db-url>`
 4. Recreate migrations for Postgres (required after switching from SQLite):

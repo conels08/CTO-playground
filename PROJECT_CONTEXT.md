@@ -52,7 +52,7 @@
   - Data is always user-scoped using `getCurrentUserId()`.
 
 - **Hosting/deploy:**
-- Planned: Supabase Postgres (free tier) as the production DB.
+  - Supabase Postgres (free tier) as the production DB.
   - Planned deploy target: Netlify (free tier) for Next.js app (with serverless functions).
   - Environment variables required in production (Netlify/Supabase dashboard), **not** local `.env.local`.
 
@@ -76,24 +76,13 @@
   - Sign out works and redirects properly
   - Demo-mode banners on dashboard and check-ins
   - Check-ins page supports demo sample data when not authenticated
-- Tooling changes:
-  - VS Code extensions installed: ESLint, Tailwind CSS IntelliSense, Prisma
-  - These surfaced lint/type issues that previously weren’t visible
-- Current blocker:
-  - `npm run lint` fails due to **3 ESLint errors** in `lib/api-utils.ts` (explicit `any` usage)
-  - Several warnings (unused vars / hook dependency / unused eslint-disable)
+  - Supabase Postgres connected and migrations applied
 
 ## Next 3 Tasks
 
-1. Fix remaining ESLint **errors** in `lib/api-utils.ts` by replacing `any` with explicit types (highest priority because lint fails).
-2. Clean up remaining ESLint **warnings** in:
-   - `app/api/quit-profile/route.ts` (unused `_request`)
-   - `app/check-ins/page.tsx` (hook dependency warning)
-   - `app/dashboard/page.tsx` (unused eslint-disable)
-3. Production readiness + deployment:
-   - Set up Supabase Postgres + Prisma migrations
-   - Configure Netlify env vars (NextAuth secrets, DB URL)
-   - Verify demo/auth behavior in production
+1. Configure Netlify env vars (NextAuth secrets, DB URL) and deploy.
+2. Replace demo credentials with a production auth provider (email/OAuth).
+3. Add monitoring/analytics (Sentry + Plausible/PostHog).
 
 ## Domain Rules / Edge Cases
 
@@ -197,7 +186,6 @@
 - Existing SQLite migrations are not compatible with Postgres; recreate migrations when switching providers.
 - Added demo-mode onboarding flow: `/onboarding` now stores a local demo profile in `localStorage` when unauthenticated and routes to `/dashboard`, while authenticated users still save via `/api/quit-profile`. Dashboard now reads that local demo profile and renders computed stats instead of only sample data, and displays whether demo data is local or sample.
 - Switched `getCurrentUserId` to rely on NextAuth session (email) instead of cookie sessionToken; updated `/api/quit-profile`, `/api/progress`, and `/api/checkins` to pass the session for user scoping.
-- Sign-in page devtools may show failed requests for extension-injected scripts; these are browser extension artifacts, not app errors.
 - Sign-in page devtools may show failed requests for extension-injected scripts; these are browser extension artifacts, not app errors.
 - Added explicit request-body validation for quit profile and check-ins to return clean 400s instead of 500s.
 - Added baseline security headers in `next.config.ts` (no CSP to avoid asset breakage in dev).
