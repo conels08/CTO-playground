@@ -409,8 +409,27 @@ npm run start
 
 ## Troubleshooting
 
-- Prisma errors mentioning `replace` usually mean the SQLite adapter did not receive a `url` config; ensure `DATABASE_URL` is set and `lib/db.ts` uses `new PrismaBetterSqlite3({ url })`.
+- If Prisma cannot connect, re-check `DATABASE_URL` and ensure you used the **Direct connection** URL from Supabase.
 - If the sign-in page shows failed script requests in DevTools Network, try a private window with extensions disabled; those requests are typically extension artifacts.
+- Slow API responses in local dev are normal when using a remote Supabase DB (especially on a hotspot). Add loading states or cache reads if needed.
+
+## Supabase Setup (Postgres Everywhere)
+
+1. Create a Supabase project and set a database password.
+2. Copy the **Direct connection** string from Supabase.
+3. Set `.env.local`:
+   - `DATABASE_URL=<your-supabase-direct-url>`
+   - Optional for migrations: `SHADOW_DATABASE_URL=<shadow-db-url>`
+4. Recreate migrations for Postgres (required after switching from SQLite):
+   - Move existing `prisma/migrations` to a backup location.
+   - Run `npm run db:generate`
+   - Run `npx prisma migrate dev --name init` (requires `SHADOW_DATABASE_URL`).
+5. Apply migrations to Supabase:
+   - `npx prisma migrate deploy`
+
+Notes:
+- If you plan to create new migrations from your local machine, set `SHADOW_DATABASE_URL` to a separate shadow database/schema to avoid migration errors.
+- This project uses Prisma’s Postgres driver adapter (`@prisma/adapter-pg` + `pg`) for Prisma 7.
 
 ## Learn More
 

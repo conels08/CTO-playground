@@ -52,7 +52,7 @@
   - Data is always user-scoped using `getCurrentUserId()`.
 
 - **Hosting/deploy:**
-  - Planned: Supabase Postgres (free tier) as the production DB.
+- Planned: Supabase Postgres (free tier) as the production DB.
   - Planned deploy target: Netlify (free tier) for Next.js app (with serverless functions).
   - Environment variables required in production (Netlify/Supabase dashboard), **not** local `.env.local`.
 
@@ -148,7 +148,8 @@
   - Credentials for dev auth (if using credentials provider):
     - `AUTH_USER=...`
     - `AUTH_PASS=...`
-  - `DATABASE_URL=file:./prisma/dev.db` (no quotes)
+  - `DATABASE_URL=<Supabase Postgres URL>` (no quotes)
+  - `SHADOW_DATABASE_URL=<shadow DB URL>` (optional; needed when running `prisma migrate dev`)
 - Production will require setting env vars in Netlify (not in repo).
 - `.env.local` should not be committed.
 
@@ -191,12 +192,13 @@
 
 - (THE FOLLOWING CONTENT IS MEANT TO ACT AS A GENERAL RECORD KEEPER
   SOLELY FOR CHATGPT TO UNDERSTAND THE CHANGES THAT HAVE HAPPENED BECAUSE MEMORY MAY NOT PERSIST AFTER CLOSING AND RELOADING VS CODE. THESE NOTES ALLOW CHAT TO UNDERSTAND WHAT IT MAY HAVE DONE IN A PREVIOUS SESSION.)
-- Prisma 7 uses `prisma.config.ts` for datasource URLs; `prisma/schema.prisma` should not define `url`. `lib/db.ts` uses a driver adapter for SQLite and relies on `.env.local` for production URLs. Keep `.env.local` unquoted.
-- Prisma SQLite adapter must be constructed with `{ url }` (not a pre-built `better-sqlite3` instance) to avoid `url.replace(...)` runtime crashes.
+- Prisma 7 uses `prisma.config.ts` for datasource URLs; `prisma/schema.prisma` should not define `url`. `lib/db.ts` uses Prisma’s Postgres driver adapter (`@prisma/adapter-pg`) and relies on `.env.local` for URLs. Keep `.env.local` unquoted.
+- Prisma provider is now `postgresql` for Supabase-first development.
+- Existing SQLite migrations are not compatible with Postgres; recreate migrations when switching providers.
 - Added demo-mode onboarding flow: `/onboarding` now stores a local demo profile in `localStorage` when unauthenticated and routes to `/dashboard`, while authenticated users still save via `/api/quit-profile`. Dashboard now reads that local demo profile and renders computed stats instead of only sample data, and displays whether demo data is local or sample.
 - Switched `getCurrentUserId` to rely on NextAuth session (email) instead of cookie sessionToken; updated `/api/quit-profile`, `/api/progress`, and `/api/checkins` to pass the session for user scoping.
-- `lib/db.ts` now chooses the SQLite adapter only when `DATABASE_URL` is empty or file-based, otherwise uses standard PrismaClient for Postgres (Supabase-ready).
-- Enabled Prisma `driverAdapters` preview feature for Prisma 7 + SQLite adapter, and added a local `better-sqlite3.d.ts` to silence missing type errors in TS.
+- Sign-in page devtools may show failed requests for extension-injected scripts; these are browser extension artifacts, not app errors.
 - Sign-in page devtools may show failed requests for extension-injected scripts; these are browser extension artifacts, not app errors.
 - Added explicit request-body validation for quit profile and check-ins to return clean 400s instead of 500s.
 - Added baseline security headers in `next.config.ts` (no CSP to avoid asset breakage in dev).
+- Local dev latency can be higher when using a remote Supabase DB (especially on a hotspot); consider caching or loading states.
