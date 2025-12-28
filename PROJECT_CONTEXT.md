@@ -192,3 +192,4 @@
 - Added explicit request-body validation for quit profile and check-ins to return clean 400s instead of 500s.
 - Added baseline security headers in `next.config.ts` (no CSP to avoid asset breakage in dev).
 - Local dev latency can be higher when using a remote Supabase DB (especially on a hotspot); consider caching or loading states.
+- VS Code Prisma extension should use the project CLI: set `prisma.prismaPath` to `node_modules/.bin/prisma` and reload the window to avoid false schema diagnostics.

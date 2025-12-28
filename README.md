@@ -413,6 +413,7 @@ npm run start
 - If Prisma cannot connect, re-check `DATABASE_URL` and ensure you used the **Direct connection** URL from Supabase.
 - If the sign-in page shows failed script requests in DevTools Network, try a private window with extensions disabled; those requests are typically extension artifacts.
 - Slow API responses in local dev are normal when using a remote Supabase DB (especially on a hotspot). Add loading states or cache reads if needed.
+- If `schema.prisma` shows false squiggles in VS Code, set `prisma.prismaPath` to `node_modules/.bin/prisma` and reload the window.
 
 ## Supabase Setup (Postgres Everywhere)
 
