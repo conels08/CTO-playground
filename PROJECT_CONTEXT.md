@@ -182,6 +182,7 @@
 
 - (THE FOLLOWING CONTENT IS MEANT TO ACT AS A GENERAL RECORD KEEPER
   SOLELY FOR CHATGPT TO UNDERSTAND THE CHANGES THAT HAVE HAPPENED BECAUSE MEMORY MAY NOT PERSIST AFTER CLOSING AND RELOADING VS CODE. THESE NOTES ALLOW CHAT TO UNDERSTAND WHAT IT MAY HAVE DONE IN A PREVIOUS SESSION.)
+- Latest state (Supabase pooler): Prisma uses Supabase Postgres with a pooler URL for `DATABASE_URL` (port 6543) so local Wi-Fi works; `DIRECT_URL` and `SHADOW_DATABASE_URL` use the direct connection (port 5432) for migrations only. `prisma/schema.prisma` includes `url` + `directUrl` and `engineType = "binary"`. `lib/db.ts` uses Prisma’s Postgres driver adapter (`@prisma/adapter-pg` + `pg`) with a shared `Pool`.
 - Prisma 7 uses `prisma.config.ts` for datasource URLs; `prisma/schema.prisma` should not define `url`. `lib/db.ts` uses Prisma’s Postgres driver adapter (`@prisma/adapter-pg`) and relies on `.env.local` for URLs. Keep `.env.local` unquoted.
 - Prisma provider is now `postgresql` for Supabase-first development.
 - Existing SQLite migrations are not compatible with Postgres; recreate migrations when switching providers.
