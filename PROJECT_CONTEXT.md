@@ -137,7 +137,8 @@
   - Credentials for dev auth (if using credentials provider):
     - `AUTH_USER=...`
     - `AUTH_PASS=...`
-  - `DATABASE_URL=<Supabase Postgres URL>` (no quotes)
+  - `DATABASE_URL=<Supabase pooler transaction URL>` (no quotes; port 6543)
+  - `DIRECT_URL=<Supabase direct URL>` (no quotes; port 5432, used for migrations)
   - `SHADOW_DATABASE_URL=<shadow DB URL>` (optional; needed when running `prisma migrate dev`)
 - Production will require setting env vars in Netlify (not in repo).
 - `.env.local` should not be committed.

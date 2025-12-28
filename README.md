@@ -156,7 +156,8 @@ pnpm install
 
 ```bash
 # Ensure DATABASE_URL is set (no quotes) in .env.local/.env
-# DATABASE_URL=<your-supabase-direct-url>
+# DATABASE_URL=<your-supabase-pooler-url>
+# DIRECT_URL=<your-supabase-direct-url>
 
 # Generate Prisma client
 npm run db:generate
@@ -418,7 +419,8 @@ npm run start
 1. Create a Supabase project and set a database password.
 2. Copy the **Direct connection** string from Supabase.
 3. Set `.env` and `.env.local`:
-   - `DATABASE_URL=<your-supabase-direct-url>`
+   - `DATABASE_URL=<your-supabase-pooler-transaction-url>` (port 6543)
+   - `DIRECT_URL=<your-supabase-direct-url>` (port 5432, used for migrations)
    - Optional for migrations: `SHADOW_DATABASE_URL=<shadow-db-url>`
 4. Recreate migrations for Postgres (required after switching from SQLite):
    - Move existing `prisma/migrations` to a backup location.
