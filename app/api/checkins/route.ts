@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/db';
-import { Prisma } from "@prisma/client";
+import type { Prisma } from "@prisma/client";
 import { getCurrentUserId, formatDateForAPI } from '@/lib/api-utils';
 import { getServerSession } from "next-auth/next";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
