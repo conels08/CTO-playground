@@ -175,7 +175,7 @@ export async function POST(request: NextRequest) {
           date: checkInDate,
           cravingIntensity: parsedCraving,
           mood: mood.trim(),
-          notes: notes || null
+          notes: typeof notes === "string" && notes.trim() !== "" ? notes.trim() : null
         }
       });
       
