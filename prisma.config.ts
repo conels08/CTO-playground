@@ -27,7 +27,14 @@ export default defineConfig({
   migrations: {
     path: 'prisma/migrations',
   },
+
+  // Prisma v7: connection URLs live in prisma.config.ts, not schema.prisma
   datasource: {
-    url: process.env.DATABASE_URL ?? 'file:./prisma/dev.db',
+    url: process.env.DATABASE_URL!,
+  },
+
+  // Use DIRECT_URL for migrate when available (recommended for Supabase)
+  migrate: {
+    datasourceUrl: process.env.DIRECT_URL ?? process.env.DATABASE_URL!,
   },
 })
