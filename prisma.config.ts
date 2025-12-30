@@ -33,8 +33,4 @@ export default defineConfig({
     url: process.env.DATABASE_URL!,
   },
 
-  // Use DIRECT_URL for migrate when available (recommended for Supabase)
-  migrate: {
-    datasourceUrl: process.env.DIRECT_URL ?? process.env.DATABASE_URL!,
-  },
 })
