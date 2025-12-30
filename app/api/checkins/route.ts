@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/db';
-import type { Prisma } from "@prisma/client";
+
 import { PrismaClientKnownRequestError } from "@prisma/client/runtime/library";
 import { getCurrentUserId, formatDateForAPI } from '@/lib/api-utils';
 import { getServerSession } from "next-auth/next";
@@ -26,10 +26,13 @@ export async function GET(request: NextRequest) {
     const toDate = searchParams.get('to');
     
     // Build where clause for date filtering
-    const where: Prisma.DailyCheckInWhereInput = { userId };
+    type FindManyArgs = Parameters<typeof prisma.dailyCheckIn.findMany>[0];
+    type Where = NonNullable<FindManyArgs["where"]>;
+
+    const where: Where = { userId };
     
     if (fromDate || toDate) {
-      const dateFilter: Prisma.DateTimeFilter = {};
+      const dateFilter: any = {};
 
       if (fromDate) {
         dateFilter.gte = new Date(fromDate + "T00:00:00.000Z");
