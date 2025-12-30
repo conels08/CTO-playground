@@ -176,7 +176,10 @@ export async function POST(request: NextRequest) {
         cigarettesPerDay: parsedCigarettesPerDay,
         costPerPack: parsedCostPerPack,
         cigarettesPerPack: parsedCigarettesPerPack,
-        personalGoal: personalGoal || null,
+        personalGoal:
+          typeof personalGoal === "string" && personalGoal.trim() !== ""
+            ? personalGoal.trim()
+            : null,
       },
       create: {
         userId,
