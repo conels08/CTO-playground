@@ -25,11 +25,8 @@ export async function GET(request: NextRequest) {
     const toDate = searchParams.get('to');
     
     // Build where clause for date filtering
-    type FindManyArgs = Parameters<typeof prisma.dailyCheckIn.findMany>[0];
-    type Where = NonNullable<FindManyArgs["where"]>;
+    const where: any = { userId };
 
-    const where: Where = { userId };
-    
     if (fromDate || toDate) {
       const dateFilter: any = {};
 
