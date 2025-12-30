@@ -4,5 +4,6 @@
     "**/.next": true
   },
   "liveServer.settings.multiRootWorkspaceName": "CTO-playground",
-  "prisma.prismaPath": "node_modules/.bin/prisma"
+  "prisma.prismaPath": "node_modules/.bin/prisma",
+  "prisma.envFile": ".env"
 }
