@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/db';
 
-import { PrismaClientKnownRequestError } from "@prisma/client/runtime/library";
 import { getCurrentUserId, formatDateForAPI } from '@/lib/api-utils';
 import { getServerSession } from "next-auth/next";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
@@ -197,11 +196,13 @@ export async function POST(request: NextRequest) {
       
     } catch (error: unknown) {
       // Handle unique constraint violation (duplicate check-in for same date)
-      if (error instanceof PrismaClientKnownRequestError && error.code === "P2002") {
-        return NextResponse.json({
-          success: false,
-          message: 'A check-in already exists for this date'
-        }, { status: 409 });
+      // Avoid importing Prisma runtime internals (Turbopack/Vercel can’t resolve them reliably)
+      const code = (error as any)?.code;
+      if (code === "P2002") {
+        return NextResponse.json(
+          { success: false, message: "A check-in already exists for this date" },
+          { status: 409 }
+        );
       }
       throw error;
     }
