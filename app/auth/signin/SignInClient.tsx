@@ -174,6 +174,16 @@ export default function SignInClient() {
                       {isSubmitting ? "Signing in..." : "Continue"}
                     </Button>
 
+                    <div className="text-center">
+                      <Link
+                        href={`/auth/signup?callbackUrl=${encodeURIComponent(callbackUrl)}`}
+                        className="text-sm text-muted-foreground hover:text-foreground"
+                      >
+                        New here? Create an account
+                      </Link>
+                    </div>
+
+
                     <p className="text-xs text-muted text-center">
                       New here? For now, you’ll need the demo credentials until we enable self-signup.
                     </p>
