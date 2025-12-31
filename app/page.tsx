@@ -114,10 +114,20 @@ export default async function Home() {
               </div>
             </div>
 
-            <div className="mt-6 flex gap-4">
+            <div className="mt-6 flex flex-wrap gap-4">
               <Link href={getStartedHref}>
                 <Button size="lg">{getStartedLabel}</Button>
               </Link>
+
+              {/* Demo CTA (keeps nav clean, gives visitors an instant hook) */}
+              {!session && (
+                <Link href="/dashboard">
+                  <Button size="lg" variant="outline">
+                    Take a Quick Tour
+                  </Button>
+                </Link>
+              )}
+
               <Link href="/about">
                 <Button size="lg" variant="outline">
                   Learn More
