@@ -26,17 +26,18 @@ export default async function Home() {
     hasProfile = Boolean(user?.quitProfile);
   }
 
-  const getStartedHref = session
+  const primaryHref = session
     ? hasProfile
       ? "/dashboard"
       : "/onboarding"
-    : "/onboarding";
+    : "/auth/signup";
 
-  const getStartedLabel = session
+  const primaryLabel = session
     ? hasProfile
       ? "Go to Dashboard"
       : "Finish Setup"
-    : "Get Started";
+    : "Start Tracking";
+
 
   return (
     <div className="py-12">
@@ -49,6 +50,25 @@ export default async function Home() {
             Track your days without cigarettes, unlock health milestones, and
             stay motivated with real health facts and inspirational quotes.
           </p>
+          <div className="mt-6 flex flex-wrap justify-center gap-3">
+            <Link href={primaryHref}>
+              <Button size="lg">{primaryLabel}</Button>
+            </Link>
+
+            {!session && (
+              <Link href="/dashboard">
+                <Button size="lg" variant="outline">
+                  Take a Quick Tour
+                </Button>
+              </Link>
+            )}
+
+            <Link href="/about">
+              <Button size="lg" variant="outline">
+                Learn More
+              </Button>
+            </Link>
+          </div>
         </div>
 
         <div className="mt-12 grid gap-6 md:grid-cols-2">
@@ -112,27 +132,6 @@ export default async function Home() {
                   Health facts and motivational content
                 </p>
               </div>
-            </div>
-
-            <div className="mt-6 flex flex-wrap gap-4">
-              <Link href={getStartedHref}>
-                <Button size="lg">{getStartedLabel}</Button>
-              </Link>
-
-              {/* Demo CTA (keeps nav clean, gives visitors an instant hook) */}
-              {!session && (
-                <Link href="/dashboard">
-                  <Button size="lg" variant="outline">
-                    Take a Quick Tour
-                  </Button>
-                </Link>
-              )}
-
-              <Link href="/about">
-                <Button size="lg" variant="outline">
-                  Learn More
-                </Button>
-              </Link>
             </div>
           </Card>
         </div>
