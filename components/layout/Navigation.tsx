@@ -6,15 +6,24 @@ import ThemeToggle from "@/components/ui/ThemeToggle";
 import { signIn, signOut, useSession } from "next-auth/react";
 import Button from "@/components/ui/Button";
 
-const navItems = [
-  { name: "Home", path: "/" },
-  { name: "About", path: "/about" },
-  { name: "Dashboard", path: "/dashboard" },
-];
-
 export default function Navigation() {
   const pathname = usePathname();
-  const { data: session } = useSession();
+  const { data: session, status } = useSession();
+
+  const baseNavItems = [
+    { name: "Home", path: "/" },
+    { name: "About", path: "/about" },
+  ];
+
+  const authedNavItems = [
+    ...baseNavItems,
+    { name: "Dashboard", path: "/dashboard" },
+  ];
+
+  const navItems = session ? authedNavItems : baseNavItems;
+
+  // Where we want users to land after auth
+  const callbackUrl = "/dashboard";
 
   return (
     <nav className="border-b border-border bg-surface">
@@ -48,18 +57,31 @@ export default function Navigation() {
               })}
             </div>
 
-            {/* Auth button */}
-            {session ? (
-              <Button size="sm" variant="outline" onClick={() => signOut({ callbackUrl: "/" })}>
+            {/* Auth actions */}
+            {status === "loading" ? null : session ? (
+              <Button
+                size="sm"
+                variant="outline"
+                onClick={() => signOut({ callbackUrl: "/" })}
+              >
                 Sign out
               </Button>
             ) : (
-              <Button size="sm" variant="outline" onClick={() => signIn()}>
-                Sign in
-              </Button>
+              <div className="flex items-center gap-2">
+                <Button
+                  size="sm"
+                  variant="outline"
+                  onClick={() => signIn(undefined, { callbackUrl })}
+                >
+                  Sign in
+                </Button>
+
+                <Link href={`/auth/signup?callbackUrl=${encodeURIComponent(callbackUrl)}`}>
+                  <Button size="sm">Create account</Button>
+                </Link>
+              </div>
             )}
 
-            {/* Theme toggle */}
             <ThemeToggle />
           </div>
         </div>
