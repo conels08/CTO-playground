@@ -1,8 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
-import { hashPassword, verifyPassword } from "@/lib/auth";
-import { cookies } from "next/headers";
-import crypto from "crypto";
+import { hashPassword } from "@/lib/auth";
 
 export async function POST(request: NextRequest) {
   try {
@@ -15,82 +13,34 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    const normalizedEmail = String(email).toLowerCase().trim();
+
     const existing = await prisma.user.findUnique({
-      where: { email },
+      where: { email: normalizedEmail },
+      select: { id: true },
     });
 
     if (existing) {
-      // If user exists but has no password yet, allow setting it
-      if (!existing.passwordHash) {
-        const newHash = await hashPassword(password);
-
-        await prisma.user.update({
-          where: { id: existing.id },
-          data: {
-            passwordHash: newHash,
-          },
-        });
-
-        return NextResponse.json({
-          success: true,
-          message: "Password set. You can now log in.",
-        });
-      }
-
-      // If user exists and has a password, block duplicate signups
-      const passwordMatches = await verifyPassword(
-        password,
-        existing.passwordHash
-      );
-
-      if (passwordMatches) {
-        return NextResponse.json(
-          {
-            success: false,
-            message: "An account with this email already exists.",
-          },
-          { status: 409 }
-        );
-      }
-
       return NextResponse.json(
-        {
-          success: false,
-          message:
-            "An account with this email already exists. Try logging in instead.",
-        },
+        { success: false, message: "An account with this email already exists. Try signing in." },
         { status: 409 }
       );
     }
 
-    const passwordHash = await hashPassword(password);
+    const passwordHash = await hashPassword(String(password));
 
-    const sessionToken = crypto.randomUUID();
-    const sessionExpiresAt = new Date();
-    sessionExpiresAt.setDate(sessionExpiresAt.getDate() + 30);
-
-    const newUser = await prisma.user.create({
+    const user = await prisma.user.create({
       data: {
-        email,
+        email: normalizedEmail,
         passwordHash,
-        sessionToken,
-        sessionExpiresAt,
       },
-    });
-
-    const cookieStore = await cookies();
-    cookieStore.set("sessionToken", sessionToken, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      sameSite: "lax",
-      path: "/",
-      expires: sessionExpiresAt,
+      select: { id: true },
     });
 
     return NextResponse.json({
       success: true,
-      message: "Account created and logged in.",
-      userId: newUser.id,
+      message: "Account created.",
+      userId: user.id,
     });
   } catch (error) {
     console.error("Signup error:", error);
