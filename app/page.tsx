@@ -2,34 +2,41 @@ import Card from "@/components/ui/Card";
 import Button from "@/components/ui/Button";
 import { getRandomHealthFact, getRandomQuote } from "@/lib/data";
 import Link from "next/link";
+import { getServerSession } from "next-auth/next";
+import { authOptions } from "@/app/api/auth/[...nextauth]/route";
+import { prisma } from "@/lib/db";
 
 // Check if user has a quit profile by attempting to fetch progress data
-async function getQuitProfileStatus(): Promise<boolean> {
-  try {
-    const response = await fetch(
-      `${process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000"}/api/quit-profile`,
-      {
-        cache: "no-cache",
-      }
-    );
 
-    if (response.ok) {
-      const result = await response.json();
-      return result.success && result.data !== null;
-    }
-  } catch (error) {
-    console.log("Could not fetch quit profile:", error);
-  }
-
-  return false;
-}
 
 export default async function Home() {
   const healthFact = getRandomHealthFact();
   const quote = getRandomQuote();
 
-  const hasProfile = await getQuitProfileStatus();
-  const getStartedHref = hasProfile ? "/dashboard" : "/onboarding";
+  const session = await getServerSession(authOptions);
+
+  let hasProfile = false;
+
+  if (session?.user?.email) {
+    const user = await prisma.user.findUnique({
+      where: { email: session.user.email },
+      select: { quitProfile: { select: { id: true } } },
+    });
+
+    hasProfile = Boolean(user?.quitProfile);
+  }
+
+  const getStartedHref = session
+    ? hasProfile
+      ? "/dashboard"
+      : "/onboarding"
+    : "/onboarding";
+
+  const getStartedLabel = session
+    ? hasProfile
+      ? "Go to Dashboard"
+      : "Finish Setup"
+    : "Get Started";
 
   return (
     <div className="py-12">
@@ -109,7 +116,7 @@ export default async function Home() {
 
             <div className="mt-6 flex gap-4">
               <Link href={getStartedHref}>
-                <Button size="lg">Get Started</Button>
+                <Button size="lg">{getStartedLabel}</Button>
               </Link>
               <Link href="/about">
                 <Button size="lg" variant="outline">
