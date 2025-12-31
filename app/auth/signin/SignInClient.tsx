@@ -183,10 +183,6 @@ export default function SignInClient() {
                       </Link>
                     </div>
 
-
-                    <p className="text-xs text-muted text-center">
-                      New here? For now, you’ll need the demo credentials until we enable self-signup.
-                    </p>
                   </form>
                 )}
 
