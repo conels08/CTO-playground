@@ -5,59 +5,62 @@ function normalizeEmail(email: string) {
   return email.trim().toLowerCase();
 }
 
+function isValidEmail(email: string) {
+  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+}
+
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json().catch(() => null);
 
-    const emailRaw = body?.email;
-    const consent = body?.consent;
+    const rawEmail = typeof body?.email === "string" ? body.email : "";
+    const consent = body?.consent === true;
+    const source =
+      typeof body?.source === "string" ? body.source : "home_hero";
 
-    if (typeof emailRaw !== "string") {
-      return NextResponse.json(
-        { success: false, message: "Email is required." },
-        { status: 400 }
-      );
-    }
+    const email = normalizeEmail(rawEmail);
 
-    if (consent !== true) {
-      return NextResponse.json(
-        { success: false, message: "Please check the consent box to subscribe." },
-        { status: 400 }
-      );
-    }
-
-    const email = normalizeEmail(emailRaw);
-
-    // basic validation (good enough for now)
-    const emailOk = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
-    if (!emailOk) {
+    if (!email || !isValidEmail(email)) {
       return NextResponse.json(
         { success: false, message: "Please enter a valid email address." },
         { status: 400 }
       );
     }
 
-    // Upsert-ish behavior: if already exists, mark consent true
+    if (!consent) {
+      return NextResponse.json(
+        {
+          success: false,
+          message: "Please agree to receive email updates.",
+        },
+        { status: 400 }
+      );
+    }
+
     await prisma.emailSubscriber.upsert({
       where: { email },
-      update: {
-        consent: true,
-        consentedAt: new Date(),
-      },
       create: {
         email,
         consent: true,
         consentedAt: new Date(),
-        source: body?.source && typeof body.source === "string" ? body.source : "home",
+        source,
+      },
+      update: {
+        consent: true,
+        consentedAt: new Date(),
+        source,
       },
     });
 
-    return NextResponse.json({
-      success: true,
-      message: "You’re in! We’ll send occasional updates (no spam).",
-    });
-  } catch (error) {
-    console.error("Subscribe error:", error);
+    return NextResponse.json(
+      {
+        success: true,
+        message: "You're on the list! We'll keep you posted.",
+      },
+      { status: 200 }
+    );
+  } catch (err) {
+    console.error("Subscribe error:", err);
     return NextResponse.json(
       { success: false, message: "Internal server error." },
       { status: 500 }
