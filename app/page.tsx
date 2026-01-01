@@ -5,6 +5,7 @@ import Link from "next/link";
 import { getServerSession } from "next-auth/next";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 import { prisma } from "@/lib/db";
+import EmailSignup from "@/components/marketing/EmailSignup";
 
 // Check if user has a quit profile by attempting to fetch progress data
 
@@ -69,6 +70,9 @@ export default async function Home() {
               </Button>
             </Link>
           </div>
+          
+          {!session && <EmailSignup />}
+
         </div>
 
         <div className="mt-12 grid gap-6 md:grid-cols-2">

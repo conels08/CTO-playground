@@ -56,3 +56,13 @@ model DailyCheckIn {
   // Ensure one check-in per user per day
   @@unique([userId, date])
 }
+
+// Consent paper trail, measure what converts to sign up, prevents duplicate emails
+model EmailSubscriber {
+  id          String    @id @default(cuid())
+  email       String    @unique
+  consent     Boolean   @default(false)
+  consentedAt DateTime?
+  source      String? // e.g. "home_hero", "footer"
+  createdAt   DateTime  @default(now())
+}

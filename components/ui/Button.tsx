@@ -1,3 +1,4 @@
+// components/ui/Button.tsx
 import { ButtonHTMLAttributes, ReactNode } from "react";
 
 interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
@@ -21,8 +22,7 @@ export default function Button({
   const variantStyles = {
     primary: "bg-blue-600 text-white hover:bg-blue-700",
     secondary: "bg-slate-700 text-white hover:bg-slate-800",
-    outline:
-      "border border-border bg-surface text-foreground hover:bg-muted",
+    outline: "border border-border bg-surface text-foreground hover:bg-surface-2",
   };
 
   const sizeStyles = {
