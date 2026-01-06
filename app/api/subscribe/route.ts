@@ -17,24 +17,70 @@ function sourceToTag(source: string | null) {
   return `source_${cleaned || "unknown"}`;
 }
 
-async function addToKit(params: {
-  email: string;
-  tags: string[];
-  consentedAtISO: string;
-}) {
-  const apiKey = process.env.KIT_API_KEY;
+/**
+ * Kit helpers (v4)
+ * - Auth header: X-Kit-Api-Key
+ * - Create subscriber: POST /v4/subscribers
+ * - Create tag: POST /v4/tags
+ * - Add subscriber to tag: POST /v4/tags/:tagId/subscribers
+ */
 
-  if (!apiKey) {
-    throw new Error("KIT_API_KEY is not set");
-  }
-
-  // Kit v4 API (JSON:API style)
-  // Endpoint: create a subscriber
-  // NOTE: If Kit responds with "already exists", we treat it as success.
-  const res = await fetch("https://api.kit.com/v4/subscribers", {
+async function ensureKitTagId(tagName: string, apiKey: string): Promise<number> {
+  const res = await fetch("https://api.kit.com/v4/tags", {
     method: "POST",
     headers: {
       "X-Kit-Api-Key": apiKey,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ name: tagName }),
+  });
+
+  const text = await res.text().catch(() => "");
+  if (!res.ok) {
+    throw new Error(`Kit tag create error ${res.status}: ${text}`);
+  }
+
+  let data: any = null;
+  try {
+    data = text ? JSON.parse(text) : null;
+  } catch {
+    // ignore; we'll error below if missing
+  }
+
+  const tagId = data?.tag?.id;
+  if (typeof tagId !== "number") {
+    throw new Error(`Kit tag create: missing tag.id in response: ${text}`);
+  }
+
+  return tagId;
+}
+
+async function addEmailToKitTag(tagId: number, email: string, apiKey: string) {
+  const res = await fetch(`https://api.kit.com/v4/tags/${tagId}/subscribers`, {
+    method: "POST",
+    headers: {
+      "X-Kit-Api-Key": apiKey,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ email_address: email }),
+  });
+
+  const text = await res.text().catch(() => "");
+  if (!res.ok) {
+    throw new Error(`Kit tag attach error ${res.status}: ${text}`);
+  }
+}
+
+async function upsertKitSubscriber(params: {
+  email: string;
+  consentedAtISO: string;
+  source: string;
+  apiKey: string;
+}) {
+  const res = await fetch("https://api.kit.com/v4/subscribers", {
+    method: "POST",
+    headers: {
+      "X-Kit-Api-Key": params.apiKey,
       "Content-Type": "application/json",
     },
     body: JSON.stringify({
@@ -42,57 +88,40 @@ async function addToKit(params: {
       state: "active",
       fields: {
         consented_at: params.consentedAtISO,
-        source: params.tags?.[0] ?? "unknown",
+        source: params.source,
       },
     }),
   });
 
-  // 2xx = success
-  if (res.ok) {
-    // Add tags (best effort). If tagging fails, we still consider subscribe successful.
-    // Kit v4 tagging uses a separate endpoint. We'll attempt it after create.
-    // If this endpoint differs in your Kit account, the log will show it and we’ll adjust quickly.
-    // await Promise.all(
-    //   params.tags.map(async (tagName) => {
-    //     try {
-    //       await fetch("https://api.kit.com/v4/tags", {
-    //         method: "POST",
-    //         headers: {
-    //           Authorization: `Token ${apiKey}`,
-    //           "Content-Type": "application/vnd.api+json",
-    //           Accept: "application/vnd.api+json",
-    //         },
-    //         body: JSON.stringify({
-    //           data: {
-    //             type: "tags",
-    //             attributes: {
-    //               name: tagName,
-    //             },
-    //           },
-    //         }),
-    //       });
-    //       // Note: Some APIs require linking tag->subscriber separately.
-    //       // If your account requires that, we’ll see it in logs and update.
-    //     } catch (e) {
-    //       console.error("Kit tag create failed:", e);
-    //     }
-    //   })
-    // );
+  // Treat "already exists" as success
+  if (res.ok || res.status === 409) return;
 
-    return { ok: true };
-  }
-
-  // Non-2xx: capture response text for logs
   const text = await res.text().catch(() => "");
+  throw new Error(`Kit subscriber error ${res.status}: ${text}`);
+}
 
-  // Many ESPs return conflict if subscriber exists.
-  // If Kit returns a conflict-like error, we treat it as success.
-  // (If it’s a different error, logs will show and we’ll refine.)
-  if (res.status === 409) {
-    return { ok: true, note: "Kit subscriber already exists" };
+async function addToKit(params: { email: string; tags: string[]; consentedAtISO: string; source: string }) {
+  const apiKey = process.env.KIT_API_KEY;
+  if (!apiKey) throw new Error("KIT_API_KEY is not set");
+
+  // 1) Create/Upsert subscriber (best effort, 409 treated as OK)
+  await upsertKitSubscriber({
+    email: params.email,
+    consentedAtISO: params.consentedAtISO,
+    source: params.source,
+    apiKey,
+  });
+
+  // 2) Ensure tags exist + attach subscriber to each tag (best effort per tag)
+  for (const tagName of params.tags) {
+    try {
+      const tagId = await ensureKitTagId(tagName, apiKey);
+      await addEmailToKitTag(tagId, params.email, apiKey);
+    } catch (e) {
+      console.error("Kit tagging failed:", { tagName, error: e });
+      // keep going; don't fail the overall subscribe
+    }
   }
-
-  throw new Error(`Kit API error ${res.status}: ${text}`);
 }
 
 export async function POST(req: NextRequest) {
@@ -102,7 +131,7 @@ export async function POST(req: NextRequest) {
     const emailRaw = typeof body?.email === "string" ? body.email : "";
     const email = emailRaw.trim().toLowerCase();
 
-    const consent = body?.consent === true;
+    const consent = body?.consent === true; // must be explicit true
     const source = typeof body?.source === "string" ? body.source.trim() : null;
 
     if (!email || !isValidEmail(email)) {
@@ -120,6 +149,7 @@ export async function POST(req: NextRequest) {
     }
 
     const consentedAt = new Date();
+    const sourceValue = source ?? "unknown";
 
     // 1) Always save to your DB (source of truth)
     await prisma.emailSubscriber.upsert({
@@ -128,7 +158,7 @@ export async function POST(req: NextRequest) {
         email,
         consent: true,
         consentedAt,
-        source: source ?? "unknown",
+        source: sourceValue,
       },
       update: {
         consent: true,
@@ -144,6 +174,7 @@ export async function POST(req: NextRequest) {
         email,
         tags,
         consentedAtISO: consentedAt.toISOString(),
+        source: sourceValue,
       });
     } catch (kitErr) {
       console.error("Kit subscribe failed (DB saved):", kitErr);
