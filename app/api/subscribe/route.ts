@@ -17,111 +17,68 @@ function sourceToTag(source: string | null) {
   return `source_${cleaned || "unknown"}`;
 }
 
-/**
- * Kit helpers (v4)
- * - Auth header: X-Kit-Api-Key
- * - Create subscriber: POST /v4/subscribers
- * - Create tag: POST /v4/tags
- * - Add subscriber to tag: POST /v4/tags/:tagId/subscribers
- */
+type Attribution = {
+  referrer?: string | null;
+  landingPath?: string | null;
+  utmSource?: string | null;
+  utmMedium?: string | null;
+  utmCampaign?: string | null;
+  utmTerm?: string | null;
+  utmContent?: string | null;
+};
 
-async function ensureKitTagId(tagName: string, apiKey: string): Promise<number> {
-  const res = await fetch("https://api.kit.com/v4/tags", {
-    method: "POST",
-    headers: {
-      "X-Kit-Api-Key": apiKey,
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({ name: tagName }),
-  });
-
-  const text = await res.text().catch(() => "");
-  if (!res.ok) {
-    throw new Error(`Kit tag create error ${res.status}: ${text}`);
-  }
-
-  let data: any = null;
-  try {
-    data = text ? JSON.parse(text) : null;
-  } catch {
-    // ignore; we'll error below if missing
-  }
-
-  const tagId = data?.tag?.id;
-  if (typeof tagId !== "number") {
-    throw new Error(`Kit tag create: missing tag.id in response: ${text}`);
-  }
-
-  return tagId;
+function cleanStr(v: unknown, max = 300) {
+  if (typeof v !== "string") return null;
+  const s = v.trim();
+  if (!s) return null;
+  return s.slice(0, max);
 }
 
-async function addEmailToKitTag(tagId: number, email: string, apiKey: string) {
-  const res = await fetch(`https://api.kit.com/v4/tags/${tagId}/subscribers`, {
-    method: "POST",
-    headers: {
-      "X-Kit-Api-Key": apiKey,
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({ email_address: email }),
-  });
-
-  const text = await res.text().catch(() => "");
-  if (!res.ok) {
-    throw new Error(`Kit tag attach error ${res.status}: ${text}`);
-  }
-}
-
-async function upsertKitSubscriber(params: {
+async function addToKit(params: {
   email: string;
+  tags: string[];
   consentedAtISO: string;
-  source: string;
-  apiKey: string;
+  attribution?: Attribution;
 }) {
+  const apiKey = process.env.KIT_API_KEY;
+  if (!apiKey) throw new Error("KIT_API_KEY is not set");
+
+  // Build Kit fields (custom fields). Keep them short + simple.
+  const fields: Record<string, string> = {
+    consented_at: params.consentedAtISO,
+    source: params.tags?.[1] ?? "unknown",
+  };
+
+  const a = params.attribution ?? {};
+  if (a.referrer) fields.referrer = a.referrer;
+  if (a.landingPath) fields.landing_path = a.landingPath;
+
+  if (a.utmSource) fields.utm_source = a.utmSource;
+  if (a.utmMedium) fields.utm_medium = a.utmMedium;
+  if (a.utmCampaign) fields.utm_campaign = a.utmCampaign;
+  if (a.utmTerm) fields.utm_term = a.utmTerm;
+  if (a.utmContent) fields.utm_content = a.utmContent;
+
+  // Create/confirm subscriber
   const res = await fetch("https://api.kit.com/v4/subscribers", {
     method: "POST",
     headers: {
-      "X-Kit-Api-Key": params.apiKey,
+      "X-Kit-Api-Key": apiKey,
       "Content-Type": "application/json",
     },
     body: JSON.stringify({
       email_address: params.email,
       state: "active",
-      fields: {
-        consented_at: params.consentedAtISO,
-        source: params.source,
-      },
+      fields,
     }),
   });
 
-  // Treat "already exists" as success
-  if (res.ok || res.status === 409) return;
+  if (res.ok) return { ok: true };
 
   const text = await res.text().catch(() => "");
-  throw new Error(`Kit subscriber error ${res.status}: ${text}`);
-}
+  if (res.status === 409) return { ok: true, note: "Kit subscriber already exists" };
 
-async function addToKit(params: { email: string; tags: string[]; consentedAtISO: string; source: string }) {
-  const apiKey = process.env.KIT_API_KEY;
-  if (!apiKey) throw new Error("KIT_API_KEY is not set");
-
-  // 1) Create/Upsert subscriber (best effort, 409 treated as OK)
-  await upsertKitSubscriber({
-    email: params.email,
-    consentedAtISO: params.consentedAtISO,
-    source: params.source,
-    apiKey,
-  });
-
-  // 2) Ensure tags exist + attach subscriber to each tag (best effort per tag)
-  for (const tagName of params.tags) {
-    try {
-      const tagId = await ensureKitTagId(tagName, apiKey);
-      await addEmailToKitTag(tagId, params.email, apiKey);
-    } catch (e) {
-      console.error("Kit tagging failed:", { tagName, error: e });
-      // keep going; don't fail the overall subscribe
-    }
-  }
+  throw new Error(`Kit API error ${res.status}: ${text}`);
 }
 
 export async function POST(req: NextRequest) {
@@ -131,8 +88,21 @@ export async function POST(req: NextRequest) {
     const emailRaw = typeof body?.email === "string" ? body.email : "";
     const email = emailRaw.trim().toLowerCase();
 
-    const consent = body?.consent === true; // must be explicit true
-    const source = typeof body?.source === "string" ? body.source.trim() : null;
+    const consent = body?.consent === true;
+    const source = cleanStr(body?.source, 80);
+
+    // Attribution coming from client (preferred)
+    const utmSource = cleanStr(body?.utmSource, 120);
+    const utmMedium = cleanStr(body?.utmMedium, 120);
+    const utmCampaign = cleanStr(body?.utmCampaign, 120);
+    const utmTerm = cleanStr(body?.utmTerm, 120);
+    const utmContent = cleanStr(body?.utmContent, 120);
+    const landingPath = cleanStr(body?.landingPath, 200);
+
+    // Referrer can be provided by client OR inferred from request headers
+    const referrerFromBody = cleanStr(body?.referrer, 300);
+    const referrerFromHeader = cleanStr(req.headers.get("referer"), 300);
+    const referrer = referrerFromBody ?? referrerFromHeader ?? null;
 
     if (!email || !isValidEmail(email)) {
       return NextResponse.json(
@@ -149,39 +119,63 @@ export async function POST(req: NextRequest) {
     }
 
     const consentedAt = new Date();
-    const sourceValue = source ?? "unknown";
 
-    // 1) Always save to your DB (source of truth)
+    // 1) Save to DB (source of truth)
     await prisma.emailSubscriber.upsert({
       where: { email },
       create: {
         email,
         consent: true,
         consentedAt,
-        source: sourceValue,
+        source: source ?? "unknown",
+
+        referrer,
+        landingPath,
+
+        utmSource,
+        utmMedium,
+        utmCampaign,
+        utmTerm,
+        utmContent,
       },
       update: {
         consent: true,
         consentedAt,
         source: source ?? undefined,
+
+        // Only update fields if provided (avoid overwriting with null)
+        referrer: referrer ?? undefined,
+        landingPath: landingPath ?? undefined,
+
+        utmSource: utmSource ?? undefined,
+        utmMedium: utmMedium ?? undefined,
+        utmCampaign: utmCampaign ?? undefined,
+        utmTerm: utmTerm ?? undefined,
+        utmContent: utmContent ?? undefined,
       },
     });
 
-    // 2) Best-effort send to Kit (do not block UX if Kit fails)
+    // 2) Best-effort send to Kit
     const tags = ["quit_smoking_tracker", sourceToTag(source)];
     try {
       await addToKit({
         email,
         tags,
         consentedAtISO: consentedAt.toISOString(),
-        source: sourceValue,
+        attribution: {
+          referrer,
+          landingPath,
+          utmSource,
+          utmMedium,
+          utmCampaign,
+          utmTerm,
+          utmContent,
+        },
       });
     } catch (kitErr) {
       console.error("Kit subscribe failed (DB saved):", kitErr);
-      // Don’t throw—DB already has the lead
     }
 
-    // Always respond success (idempotent UX)
     return NextResponse.json({
       success: true,
       message: "You’re in. Updates coming your way.",

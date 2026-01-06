@@ -63,6 +63,16 @@ model EmailSubscriber {
   email       String    @unique
   consent     Boolean   @default(false)
   consentedAt DateTime?
-  source      String? // e.g. "home_hero", "footer"
+  source      String?
   createdAt   DateTime  @default(now())
+
+  // Attribution (optional)
+  referrer    String?
+  landingPath String?
+
+  utmSource   String?
+  utmMedium   String?
+  utmCampaign String?
+  utmTerm     String?
+  utmContent  String?
 }
