@@ -63,7 +63,7 @@ async function addToKit(params: {
           await fetch("https://api.kit.com/v4/tags", {
             method: "POST",
             headers: {
-              Authorization: `Bearer ${apiKey}`,
+              Authorization: `Token ${apiKey}`,
               "Content-Type": "application/vnd.api+json",
               Accept: "application/vnd.api+json",
             },
