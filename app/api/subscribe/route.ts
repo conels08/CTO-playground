@@ -34,20 +34,15 @@ async function addToKit(params: {
   const res = await fetch("https://api.kit.com/v4/subscribers", {
     method: "POST",
     headers: {
-      Authorization: `Token ${apiKey}`,
-      "Content-Type": "application/vnd.api+json",
-      Accept: "application/vnd.api+json",
+      "X-Kit-Api-Key": apiKey,
+      "Content-Type": "application/json",
     },
     body: JSON.stringify({
-      data: {
-        type: "subscribers",
-        attributes: {
-          email_address: params.email,
-          // Helps you in Kit: you can see they consented and when (custom fields are optional)
-          fields: {
-            consented_at: params.consentedAtISO,
-          },
-        },
+      email_address: params.email,
+      state: "active",
+      fields: {
+        consented_at: params.consentedAtISO,
+        source: params.tags?.[0] ?? "unknown",
       },
     }),
   });
@@ -57,32 +52,32 @@ async function addToKit(params: {
     // Add tags (best effort). If tagging fails, we still consider subscribe successful.
     // Kit v4 tagging uses a separate endpoint. We'll attempt it after create.
     // If this endpoint differs in your Kit account, the log will show it and we’ll adjust quickly.
-    await Promise.all(
-      params.tags.map(async (tagName) => {
-        try {
-          await fetch("https://api.kit.com/v4/tags", {
-            method: "POST",
-            headers: {
-              Authorization: `Token ${apiKey}`,
-              "Content-Type": "application/vnd.api+json",
-              Accept: "application/vnd.api+json",
-            },
-            body: JSON.stringify({
-              data: {
-                type: "tags",
-                attributes: {
-                  name: tagName,
-                },
-              },
-            }),
-          });
-          // Note: Some APIs require linking tag->subscriber separately.
-          // If your account requires that, we’ll see it in logs and update.
-        } catch (e) {
-          console.error("Kit tag create failed:", e);
-        }
-      })
-    );
+    // await Promise.all(
+    //   params.tags.map(async (tagName) => {
+    //     try {
+    //       await fetch("https://api.kit.com/v4/tags", {
+    //         method: "POST",
+    //         headers: {
+    //           Authorization: `Token ${apiKey}`,
+    //           "Content-Type": "application/vnd.api+json",
+    //           Accept: "application/vnd.api+json",
+    //         },
+    //         body: JSON.stringify({
+    //           data: {
+    //             type: "tags",
+    //             attributes: {
+    //               name: tagName,
+    //             },
+    //           },
+    //         }),
+    //       });
+    //       // Note: Some APIs require linking tag->subscriber separately.
+    //       // If your account requires that, we’ll see it in logs and update.
+    //     } catch (e) {
+    //       console.error("Kit tag create failed:", e);
+    //     }
+    //   })
+    // );
 
     return { ok: true };
   }
