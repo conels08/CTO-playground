@@ -3,10 +3,59 @@
 import * as React from "react";
 import Button from "@/components/ui/Button";
 
+type SubscribePayload = {
+  email: string;
+  consent: boolean;
+  source: string;
+
+  // attribution
+  landingUrl?: string | null;
+  referrer?: string | null;
+  utmSource?: string | null;
+  utmMedium?: string | null;
+  utmCampaign?: string | null;
+  utmTerm?: string | null;
+  utmContent?: string | null;
+};
+
+function getAttributionFromLocation(): Omit<
+  SubscribePayload,
+  "email" | "consent" | "source"
+> {
+  // Only runs on client
+  const landingUrl = typeof window !== "undefined" ? window.location.href : null;
+  const referrer =
+    typeof document !== "undefined" && document.referrer
+      ? document.referrer
+      : null;
+
+  const params =
+    typeof window !== "undefined"
+      ? new URLSearchParams(window.location.search)
+      : new URLSearchParams();
+
+  const pick = (key: string) => {
+    const v = params.get(key);
+    return v && v.trim().length > 0 ? v.trim() : null;
+  };
+
+  return {
+    landingUrl,
+    referrer,
+    utmSource: pick("utm_source"),
+    utmMedium: pick("utm_medium"),
+    utmCampaign: pick("utm_campaign"),
+    utmTerm: pick("utm_term"),
+    utmContent: pick("utm_content"),
+  };
+}
+
 export default function EmailSignup() {
   const [email, setEmail] = React.useState("");
   const [consent, setConsent] = React.useState(false);
-  const [status, setStatus] = React.useState<"idle" | "loading" | "success" | "error">("idle");
+  const [status, setStatus] = React.useState<
+    "idle" | "loading" | "success" | "error"
+  >("idle");
   const [message, setMessage] = React.useState("");
 
   async function onSubmit(e: React.FormEvent) {
@@ -22,13 +71,22 @@ export default function EmailSignup() {
     setStatus("loading");
 
     try {
+      const attribution = getAttributionFromLocation();
+
+      const payload: SubscribePayload = {
+        email,
+        consent,
+        source: "home_hero",
+        ...attribution,
+      };
+
       const res = await fetch("/api/subscribe", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, consent, source: "home_hero" }),
+        body: JSON.stringify(payload),
       });
 
-      const data = await res.json();
+      const data = await res.json().catch(() => null);
 
       if (!res.ok || !data?.success) {
         throw new Error(data?.message || "Could not subscribe.");
