@@ -12,10 +12,7 @@ export default function AboutPage() {
         <div className="mt-8 space-y-6">
           <Card title="Project Overview">
             <p className="text-muted-foreground">
-              This is a modern web application built with Next.js 16, TypeScript,
-              and Tailwind CSS. It demonstrates best practices for structuring a
-              scalable web application with reusable components and utility
-              functions.
+              This quit smoking tracker was built to be simple, honest, and actually useful. After quitting smoking myself and staying smoke-free for over a year, I realized how powerful it is to see real progress — days added up, cravings reduced, and milestones reached. I wanted others to have an easy, free way to track that journey without ads, pressure, or gimmicks. This app is built using modern web technology (Next.js, Supabase, and secure cloud hosting) to make sure your data is safe, fast, and accessible anywhere. My goal is — and always will be — to create low-to-no-cost web tools that solve real problems for real people. If you choose to subscribe, you’ll automatically get free access to my next online tool when it launches, along with occasional updates about other useful projects I’m working on. No spam — just value, transparency, and tools designed to help.
             </p>
           </Card>
 
