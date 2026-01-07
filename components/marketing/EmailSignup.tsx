@@ -74,8 +74,12 @@ export default function EmailSignup() {
       }
 
       setStatus("success");
-      setMessage(data.message || "Subscribed!");
-      setIsSubscribed(true); // hide the box after success
+      setMessage(data.message || "You're subscribed! 🎉");
+
+      // Delay hiding the form so the user sees confirmation
+      setTimeout(() => {
+        setIsSubscribed(true);
+      }, 3000);
     } catch (err) {
       setStatus("error");
       setMessage(err instanceof Error ? err.message : "Could not subscribe.");
