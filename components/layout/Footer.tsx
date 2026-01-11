@@ -9,12 +9,14 @@ export default function Footer() {
           Tailwind CSS by Colby Nelsen (Site Assistant PDX).
         </p>
 
-        <Link
+        <div className="mt-2 flex justify-center">
+          <Link
             href="/about#support"
-            className="hover:text-foreground transition-colors"
+            className="rounded-full border border-border px-3 py-1 text-sm font-medium text-muted-foreground transition-colors hover:border-foreground/40 hover:text-foreground"
           >
             Support this project
           </Link>
+        </div>
       </div>
     </footer>
   );
