@@ -1,4 +1,5 @@
 import Card from "@/components/ui/Card";
+import SupportThisProject from "@/components/SupportThisProject";
 
 export default function AboutPage() {
   return (
@@ -69,6 +70,8 @@ export default function AboutPage() {
               </p>
             </div>
           </Card>
+
+          <SupportThisProject />
         </div>
       </div>
     </div>
