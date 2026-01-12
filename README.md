@@ -13,6 +13,7 @@ A quit-smoking tracker built with Next.js 16, TypeScript, Tailwind CSS, and Pris
 - 📝 **Daily Check-ins** - Cravings, mood, and notes (one per day)
 - 🧭 **Demo Mode** - Safe sample data for unauthenticated visitors
 - 📬 **Email Opt-in** - Consent-gated signup with UTM/referrer attribution and Kit sync
+- 💙 **Donations** - PayPal donate section on the About page with a footer link
 - ✨ **Code Quality** - ESLint + Prettier
 
 ## Tech Stack
@@ -123,3 +124,7 @@ Open `http://localhost:3000`.
 - Email opt-ins are stored in Postgres and then synced to Kit on a best-effort basis.
 - `lib/auth.ts` uses a simple SHA-256 hash for passwords (not production-grade).
 
+## Repo Safety
+
+- No secrets are committed; `.env*` files are ignored by default.
+- A full history scan (TruffleHog) reports zero secrets.

@@ -30,7 +30,8 @@
   - Demo mode determined via NextAuth client session:
     - `const { status } = useSession();`
     - `const isDemo = status !== "authenticated";`
-  - Homepage includes `components/marketing/EmailSignup` with opt-in + attribution capture
+- Homepage includes `components/marketing/EmailSignup` with opt-in + attribution capture
+  - About page includes `components/SupportThisProject` with PayPal donate form
 
 - **Backend:**
   - Next.js route handlers (`app/api/**/route.ts`)
@@ -133,6 +134,8 @@
   - Validates email + consent, stores `EmailSubscriber`, syncs to Kit
 - `components/marketing/EmailSignup.tsx`
   - Homepage opt-in form with attribution capture
+- `components/SupportThisProject.tsx`
+  - About page PayPal donate form (linked from the footer)
 - `lib/api-utils.ts`
   - Helper functions (`getCurrentUserId`, date formatting, calculations)
 - `lib/db.ts`
@@ -151,6 +154,7 @@
   - `KIT_API_KEY=<Kit API key>` (optional; used by `/api/subscribe`)
 - Production will require setting env vars in the hosting provider (not in repo).
 - `.env.local` should not be committed.
+- Repo hygiene: `.env*` files are ignored and a full history scan reports no secrets.
 
 ## Lint/Tooling Notes
 
